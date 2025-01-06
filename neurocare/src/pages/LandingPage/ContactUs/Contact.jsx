@@ -13,15 +13,15 @@ const Contact = () => {
           we can support your mental health journey.
         </p>
       </div>
-      <div className="md:flex justify-evenly place-items-center m-5 ">
-        <div className="md:w-[50%] w-[60%] pb-10">
-          <div className="flex gap-10 items-center">
+      <div className="md:flex md:justify-self-center justify-center place-items-center md:pl-20 md:pr-20 md:w-[80%] ">
+        <div className="md:w-[50%] w-[70%] pb-10 grid justify-center items-center ">
+          <div className="flex gap-10 items-center ">
             <div className="">
               <FaLocationDot className="text-2xl" />
             </div>
             <div className="text-left">
               <h3>Address</h3>
-              <p>Nairobi, Kenya</p>
+              <p className="font-light">Nairobi, Kenya</p>
             </div>
           </div>
           <div className="flex gap-10 items-center">
@@ -30,7 +30,7 @@ const Contact = () => {
             </div>
             <div className="text-left">
               <h3>Phone</h3>
-              <p>+254-712-456-789</p>
+              <p className="font-light">+254-712-456-789</p>
             </div>
           </div>
           <div className="flex gap-10 items-center">
@@ -39,14 +39,14 @@ const Contact = () => {
             </div>
             <div className="text-left">
               <h3>Email</h3>
-              <p>neurocare@gmail.com</p>
+              <p className="font-light">neurocare@gmail.com</p>
             </div>
           </div>
         </div>
-        <div className="rounded-lg bg-[#F5F5F5] md:w-[50%] w-full">
-          <form className="grid justify-center place-items-center w-[100%]" action="">
-            <h3 className="p-5 font-bold">Send Message</h3>
-            <div className="grid justify-evenly place-items-center gap-5">
+        <div className="rounded-lg bg-[#F5F5F5] md:w-[50%] w-[70%]">
+          <form className="grid justify-self-center w-[100%] md:w-[100%]" action="">
+            <h3 className="p-5 font-bold text-center">Send Message</h3>
+            <div className="grid place-items-center gap-5 p-5 w-full">
               <input
                 className="p-3 rounded-lg text-black flex w-full"
                 type="text"
@@ -70,10 +70,10 @@ const Contact = () => {
                 required
               />
             </div>
-            <div>
+            <div className="grid w-full">
               <button
                 type="submit"
-                className="bg-[#608BC1] text-white rounded-md p-2 m-10 hover:bg-white w-[70%]"
+                className="place-self-center bg-[#608BC1] text-white rounded-md p-2 m-5 hover:bg-white w-[50%] "
               >
                 Send
               </button>
