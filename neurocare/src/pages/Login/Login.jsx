@@ -4,12 +4,12 @@ import { IoMail } from "react-icons/io5";
 import { IoIosLock } from "react-icons/io";
 const Login = () => {
   return (
-    <section className=" grid place-items-center bg-[#D9D9D9] h-[100vh] ">
-      <div className=" place-self-center flex bg-white md:w-[50%] w-[80%] ">
-        <div className="w-3/5">
+    <section className=" md:grid place-items-center md:bg-[#D9D9D9] md:h-[100vh] h-full">
+      <div className=" place-self-center md:flex bg-white md:w-[50%] w-[100%] ">
+        <div className="md:w-3/5">
           <div>
             <img
-              className="w-20"
+              className="md:w-20 w-2 invisible md:visible"
               src="../../../src/assets/Logo-hero.png"
               alt=""
             />
@@ -74,7 +74,7 @@ const Login = () => {
             <div className="place-self-center">
               <button
                 type="submit"
-                className=" border-2 border-[#608BC1] inline-block text-black hover:bg-[#608BC1] rounded-full px-12 py-2 font-semibold mb-2 hover:text-white w-full"
+                className=" border-2 border-[#608BC1] inline-block text-black hover:bg-[#608BC1] rounded-full px-12 py-2 font-semibold mb-2 hover:text-white w-full max-[750px]:mb-10"
               >
                 Login
               </button>
@@ -82,7 +82,7 @@ const Login = () => {
             </div>
           </div>
         </div>
-        <div className="bg-[#608BC1] rounded-l-xl w-2/5 grid place-items-center ">
+        <div className="bg-[#608BC1] md:rounded-l-xl max-[770px]:rounded-t-full  md:w-2/5 grid place-items-center ">
           <div className="place-items-center">
             <h1 className="text-3xl text-white mb-2 font-bold">
               Hello, Friend!
