@@ -1,6 +1,6 @@
 const About = () => {
   return (
-    <section className="pt-10">
+    <section className="pt-10 pb-20">
       <h1 className="text-center align-text-top font-bold text-[20px]">
         {" "}
         About Us

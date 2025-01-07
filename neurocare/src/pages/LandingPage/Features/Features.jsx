@@ -1,6 +1,6 @@
 const Features = () => {
   return (
-    <section className="bg-[#77DD77] rounded-t-lg">
+    <section className="bg-[#77DD77] rounded-t-lg pb-20">
       <div>
         <h2 className="text-center font-bold text-[20px] p-5">Features</h2>
       </div>

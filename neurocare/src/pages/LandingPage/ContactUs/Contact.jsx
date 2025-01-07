@@ -3,7 +3,7 @@ import { FaPhoneAlt } from "react-icons/fa";
 import { IoMail } from "react-icons/io5";
 const Contact = () => {
   return (
-    <section>
+    <section className="md:pb-20">
       <div>
         <h1 className="text-center font-bold text-[20px] pt-10 pb-5">
           Contact Us
@@ -62,7 +62,7 @@ const Contact = () => {
               />
 
               <textarea
-                className="p-3 rounded-lg text-black flex w-full h-[150px]"
+                className="p-3 rounded-lg text-black flex w-full h-[150px] resize-none"
                 rows="5"
                 id="message"
                 name="message"
