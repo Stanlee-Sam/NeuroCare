@@ -6,17 +6,17 @@ import { IoIosLock } from "react-icons/io";
 const Login = () => {
   return (
     <section className="grid place-items-center bg-[#D9D9D9] h-screen">
-      <div className="md:flex bg-white md:w-[50%] w-full grid grid-rows-[auto_1fr] h-full md:h-[95vh] place-self-center">
+      <div className="md:flex bg-white md:w-[50%] w-full grid  h-full md:h-auto lg:h-[75] place-self-center">
         {/* Login Form Section */}
-        <div className="md:w-3/5 md:pb-10 md:p-5">
-          <div>
+        <div className=" place-self-center md:w-3/5 md:pb-10 ">
+          <div className="">
             <img
               className="md:w-20 w-2 invisible md:visible"
               src="../../../src/assets/Logo-hero.png"
               alt=""
             />
           </div>
-          <div className="grid place-items-center">
+          <div className="grid place-self-center">
             <h1 className="text-center text-3xl text-[#608BC1] font-bold">
               Login to Account
             </h1>
@@ -26,15 +26,15 @@ const Login = () => {
             <div className="flex justify-center gap-x-4 my-2">
               <a
                 href="#"
-                className="border-2 border-gray-200 mx-1 p-2 rounded-[50%]"
+                className="border-2 border-gray-200 mx-1 p-2 rounded-[50%] hover:border-[#608BC1]"
               >
-                <FaGoogle className="w-6 h-6 text-black" />
+                <FaGoogle className="w-6 h-6 text-black hover:text-[#608BC1]" />
               </a>
               <a
                 href="#"
-                className="border-2 border-gray-200 mx-1 p-2 rounded-[50%]"
+                className="border-2 border-gray-200 mx-1 p-2 rounded-[50%] hover:border-[#608BC1]"
               >
-                <FaFacebookF className="w-6 h-6 text-black" />
+                <FaFacebookF className="w-6 h-6 text-black hover:text-[#608BC1]" />
               </a>
             </div>
 
@@ -88,15 +88,15 @@ const Login = () => {
         {/* Blue Section */}
         <div className="bg-[#608BC1] md:rounded-l-xl max-[770px]:rounded-t-full md:w-2/5 grid place-items-center row-start md:row-start-auto">
           <div className="place-items-center">
-            <h1 className="md:text-3xl text-white md:mb-2 font-bold text-[18px]">
-              Hello, Friend!
+          <h1 className=" text-[20px] min-[1140px]:text-2xl max-[770px]:mt-5 text-white md:mb-2 font-bold">
+          Hello, Friend!
             </h1>
-            <div className="border-2 place-self-center my-5 border-white inline-block mb-2 w-10"></div>
+            <div className="border-2 place-self-center md:my-5 border-white inline-block mb-2 w-10"></div>
 
             <p className="text-center px-2 md:mb-3 text-white text-[12px] md:text-[20px]">
               Enter your personal details and start your journey with us
             </p>
-            <button className="border-2 border-white inline-block text-white hover:bg-white rounded-full px-12 py-2 font-semibold mt-5 hover:text-[#608BC1] w-full">
+            <button className="border-2 border-white inline-block text-white hover:bg-white rounded-full px-12 py-2 font-semibold mt-3 md:mt-5 hover:text-[#608BC1] w-full">
               Sign Up
             </button>
           </div>

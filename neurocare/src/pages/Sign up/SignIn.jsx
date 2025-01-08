@@ -5,8 +5,8 @@ import { IoIosLock } from "react-icons/io";
 import { MdAccountCircle } from "react-icons/md";
 const SignUp = () => {
   return (
-    <section className=" grid place-items-center bg-[#D9D9D9] md:h-[100vh] ">
-      <div className=" place-self-center md:flex bg-white md:w-[50%] w-[100%] ">
+    <section className=" grid place-items-center bg-[#D9D9D9] md:h-screen  ">
+      <div className=" place-self-center md:flex bg-white  md:w-[50%] w-[100%] ">
         <div className="bg-[#77DD77] md:rounded-r-xl max-[770px]:rounded-b-full md:w-2/5 grid place-items-center ">
           <div className="place-items-center">
             <h1 className=" text-[20px] min-[1140px]:text-2xl max-[770px]:mt-5 text-white md:mb-2 font-bold">
@@ -40,15 +40,15 @@ const SignUp = () => {
             <div className="flex justify-center gap-x-4 my-2">
               <a
                 href="#"
-                className="border-2 border-gray-200 mx-1 p-2 rounded-[50%] "
+                className="border-2 border-gray-200 mx-1 p-2 rounded-[50%] hover:border-[#77DD77] "
               >
-                <FaGoogle className="w-6 h-6 text-black" />
+                <FaGoogle className="w-6 h-6 text-black hover:text-[#77DD77]" />
               </a>
               <a
                 href="#"
-                className="border-2 border-gray-200 mx-1 p-2 rounded-[50%] "
+                className="border-2 border-gray-200 mx-1 p-2 rounded-[50%] hover:border-[#77DD77]"
               >
-                <FaFacebookF className="w-6 h-6 text-black" />
+                <FaFacebookF className="w-6 h-6 text-black hover:text-[#77DD77]" />
               </a>
             </div>
 
