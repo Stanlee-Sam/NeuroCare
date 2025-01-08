@@ -1,4 +1,3 @@
-import React from "react";
 import { FaGoogle } from "react-icons/fa";
 import { FaFacebookF } from "react-icons/fa6";
 import { IoMail } from "react-icons/io5";
