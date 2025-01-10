@@ -43,7 +43,7 @@ const Sidebar = () => {
               to="/dashboard"
             >
               <MdDashboard className="justify-center" />
-              {open && <p>Dashboard</p>}
+              {open && <p className="">Dashboard</p>}
             </Link>{" "}
           </li>
           <li>
