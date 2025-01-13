@@ -11,7 +11,7 @@ const Sidebar = () => {
   const [open, setOpen] = useState(false);
 
   return (
-    <div>
+    <div className="">
       <div
         className={`${
           open ? "w-72" : "w-[50px]"
