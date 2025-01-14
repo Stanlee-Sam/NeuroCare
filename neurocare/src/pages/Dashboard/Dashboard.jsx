@@ -1,3 +1,4 @@
+import JournalCalendar from "../../Components/Calendar/Calendar";
 import StressLevels from "../../Components/Charts/BarChart";
 import SentimentChart from "../../Components/Charts/LineChart";
 import SentimentCategories from "../../Components/Charts/PieChart";
@@ -75,8 +76,8 @@ const Dashboard = () => {
                         <FaArrowTrendUp />
                       </div>
                     </div>
-                    <p className="text-sm">Total entries</p>
-                    <span className="text-sm">-2% than last month</span>
+                    <p className="text-sm text-center">Total entries</p>
+                    <span className="text-sm text-center">-2% than last month</span>
                   </div>
                   <div className="flex flex-col   bg-white rounded-lg p-4  ">
                   <h3 className="text-[15px] font-light text-center">
@@ -87,12 +88,13 @@ const Dashboard = () => {
                         className="bg-red-600 h-full rounded-lg"
                         style={{ width: "80%" }}
                       ></div>
-                      <div className="flex justify-between text-[10px] ">
+                      
+                    </div>
+                    <div className="flex justify-between text-[10px] ">
                         <p>Low</p>
                         <p>Medium</p>
                         <p>High</p>
                       </div>
-                    </div>
                   </div>
                 </div>
               </div>
@@ -119,7 +121,9 @@ const Dashboard = () => {
 
             {/* RIGHT */}
             <div className="calendar & recent activity w-full md:w-2/6 bg-white rounded-lg p-5">
-              <div className="sentiment-calendar"> r</div>
+              <div className="sentiment-calendar"> 
+                <JournalCalendar />
+              </div>
               <div className="recent-activity"></div>
             </div>
           </div>
