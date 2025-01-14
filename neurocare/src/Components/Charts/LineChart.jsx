@@ -47,7 +47,7 @@ const data = [
 
 const SentimentChart = () => {
   return (
-    <div className="bg-white  rounded-lg p-4">
+    <div className="bg-white  rounded-lg p-4 ">
       <div className="flex justify-between items-center">
         <h1 className="text-sm font-semibold ">Sentiment Trends</h1>
         <div>

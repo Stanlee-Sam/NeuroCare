@@ -19,8 +19,8 @@ const renderActiveShape = (props) => {
     const cos = Math.cos(-RADIAN * midAngle);
     const sx = cx + (outerRadius + 10) * cos;
     const sy = cy + (outerRadius + 10) * sin;
-    const mx = cx + (outerRadius + 30) * cos;
-    const my = cy + (outerRadius + 30) * sin;
+    const mx = cx + (outerRadius + 1) * cos;
+    const my = cy + (outerRadius + 20) * sin;
     const ex = mx + (cos >= 0 ? 1 : -1) * 22;
     const ey = my;
     const textAnchor = cos >= 0 ? 'start' : 'end';
@@ -50,10 +50,9 @@ const renderActiveShape = (props) => {
           outerRadius={outerRadius + 10}
           fill={fill}
         />
-        <path d={`M${sx},${sy}L${mx},${my}L${ex},${ey}`} stroke={fill} fill="none" />
-        <circle cx={ex} cy={ey} r={2} fill={fill} stroke="none" />
-        <text x={ex + (cos >= 0 ? 1 : -1) * 12} y={ey} textAnchor={textAnchor} fill="#333">{`PV ${value}`}</text>
-        <text x={ex + (cos >= 0 ? 1 : -1) * 12} y={ey} dy={18} textAnchor={textAnchor} fill="#999">
+<path d={`M${sx},${sy}L${ex},${ey}`} stroke={fill} fill="none" />        <circle cx={ex} cy={ey} r={2} fill={fill} stroke="none" />
+        <text x={ex + (cos >= 0 ? 1 : -1) * 12} y={ey} textAnchor={textAnchor} fontSize={10} fontWeight={700} fill="#333">{`PV ${value}`}</text>
+        <text x={ex + (cos >= 0 ? 1 : -1) * 12} y={ey} dy={18} textAnchor={textAnchor} fontSize={10} fill="#999">
           {`(Rate ${(percent * 100).toFixed(2)}%)`}
         </text>
       </g>
@@ -70,13 +69,13 @@ const SentimentCategories = () => {
     }; 
 
   return (
-    <div className="bg-white h-full rounded-lg p-4">
+    <div className="bg-white w-full rounded-lg p-4">
         <div className="flex justify-between items-center">
             <h1 className="text-sm font-semibold ">Sentiment Categories</h1>
             <div><SlOptions /></div>
         </div>
-        <ResponsiveContainer width="100%" height="100%">
-        <PieChart width={400} height={400}>
+        <ResponsiveContainer width="100%" height={300}>
+        <PieChart width={500} height={500}>
           <Pie
             activeIndex={activeIndex}
             activeShape={renderActiveShape}
@@ -84,7 +83,7 @@ const SentimentCategories = () => {
             cx="50%"
             cy="50%"
             innerRadius={60}
-            outerRadius={80}
+            outerRadius={90}
             fill="#8884d8"
             dataKey="value"
             onMouseEnter={onPieEnter}
