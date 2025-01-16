@@ -3,7 +3,7 @@ import { IoMdSearch } from "react-icons/io";
 
 const Topbar = () => {
   return (
-    <div className="h-16 flex justify-between items-center  px-2 w-full top-0 z-12">
+    <div className="h-16 flex justify-between items-center  px-2 w-full top-0 z-12 pl-12 md:pl-14">
       <div className="flex items-center  relative font-light   ">
         <input
           type="text"
@@ -15,9 +15,9 @@ const Topbar = () => {
       <div className="flex ml-1 space-x-5 items-center">
         <div className="relative">
           <FaBell />
-          <span className="absolute bottom-4 right-0 text-sm text-red-600">
-            0
-          </span>
+          <div className="absolute bottom-4 right-0 text-sm bg-red-600 w-2 h-2 rounded-full animate-pulse">
+            
+          </div>
         </div>
         <div className="w-8">
           <img

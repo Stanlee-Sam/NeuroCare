@@ -69,7 +69,7 @@ const SentimentCategories = () => {
     }; 
 
   return (
-    <div className="bg-white w-full rounded-lg p-4">
+    <div className="bg-white  rounded-lg p-4 flex flex-col gap-2 transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-130 hover:shadow-2xl">
         <div className="flex justify-between items-center">
             <h1 className="text-sm font-semibold ">Sentiment Categories</h1>
             <div><SlOptions /></div>
