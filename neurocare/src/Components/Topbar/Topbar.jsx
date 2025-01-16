@@ -3,7 +3,7 @@ import { IoMdSearch } from "react-icons/io";
 
 const Topbar = () => {
   return (
-    <div className="h-16 flex justify-between items-center  px-2 w-full top-0 z-12 pl-12 md:pl-14">
+    <div className="h-16 flex flex-row justify-between items-center  px-2 max-w-full top-0 z-12 pl-12 md:pl-14">
       <div className="flex items-center  relative font-light   ">
         <input
           type="text"

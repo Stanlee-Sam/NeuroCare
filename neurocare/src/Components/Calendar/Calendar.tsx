@@ -11,7 +11,7 @@ const JournalCalendar: React.FC = () => {
     const [value, onChange] = useState<Value>(new Date());
 
     return (
-        <div>
+        <div className=''>
             <Calendar onChange={onChange} value={value} />
         </div>
     );

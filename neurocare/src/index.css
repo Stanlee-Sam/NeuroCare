@@ -2,12 +2,50 @@
 @tailwind components;
 @tailwind utilities;
 
-.react-calendar {
-  width: 100% !important; 
-  border: none !important;
-  
+@layer base {
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    /* overflow-x: hidden; */
+  }
 }
 
+.react-calendar {
+  width: full !important; 
+  border: none !important;
+  position: relative !important;
+  z-index: 10 !important;
+  
+}
+/* @media (max-width: 450px) {
+  .react-calendar {
+    width: 280px !important;
+  }
+} */
+@media (max-width: 380px) {
+  .react-calendar {
+    width: 230px !important;
+  }
+}
+/* @media (max-width: 715px) {
+  .react-calendar {
+    width: full !important;
+  }
+} */
+@media (max-width: 820px) {
+  .react-calendar {
+    width: 200px !important;
+  }
+}
+@media (max-width: 1119px) {
+  .react-calendar {
+    width: 250px !important;
+  }
+}
 .react-calendar__tile--active {
     background-color: #77DD77 !important;
     border-radius: 5px;

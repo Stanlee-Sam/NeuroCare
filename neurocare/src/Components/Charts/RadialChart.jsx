@@ -26,17 +26,17 @@ const data = [
   {
     name: "Calendar",
     count: 47,
-    fill: "#83a6ed",
+    fill: "#FF5733",
   },
   {
     name: "NeuroBot",
     count: 39,
-    fill: "#8dd1e1",
+    fill: "#00FFFF",
   },
   {
     name: "Dashboard",
     count: 55,
-    fill: "#82ca9d",
+    fill: "#581845",
   },
   
 ];
@@ -77,27 +77,27 @@ const FeautureInteraction = () => {
       <img className="absolute top-[40%] left-[41.5%] w-[70px]" src="../../../src/assets/features.png" alt="" />
       <div className="grid grid-cols-2 gap-1">
         <div className="flex items-center gap-1">
-          <div className="w-2 h-2 bg-blue-600 rounded-lg"></div>
-          <h3 className="text-sm font-semibold flex items-center gap-1">
+          <div className="w-2 h-2 bg-[#8884d8] rounded-lg"></div>
+          <h3 className="text-[10px] font-semibold flex items-center gap-1">
           <IoJournal />
 
             Mood Tracking</h3>
         </div>
         <div className="flex items-center gap-1">
-          <div className="w-2 h-2 bg-blue-600 rounded-lg"></div>
-          <h3 className="text-sm font-semibold flex items-center gap-1">
+          <div className="w-2 h-2 bg-[#FF5733] rounded-lg"></div>
+          <h3 className="text-[10px] font-semibold flex items-center gap-1">
           <FaCalendarAlt />
             Calendar</h3>
         </div>
         <div className="flex items-center gap-1">
-          <div className="w-2 h-2 bg-blue-600 rounded-lg"></div>
-          <h3 className="text-sm font-semibold flex items-center gap-1">
+          <div className="w-2 h-2 bg-[#00FFFF] rounded-lg"></div>
+          <h3 className="text-[10px] font-semibold flex items-center gap-1">
           <FaRobot />
           NeuroBot</h3>
         </div>
         <div className="flex items-center gap-1">
-          <div className="w-2 h-2 bg-blue-600 rounded-lg"></div>
-          <h3 className="text-sm font-semibold flex items-center gap-1">
+          <div className="w-2 h-2 bg-[#581845] rounded-lg"></div>
+          <h3 className="text-[10px] font-semibold flex items-center gap-1">
           <MdDashboard />
           Dashboard</h3>
         </div>

@@ -47,7 +47,7 @@ const data = [
 
 const SentimentChart = () => {
   return (
-    <div className="bg-white  rounded-lg p-4 flex flex-col gap-2 transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-130 hover:shadow-2xl">
+    <div className="bg-white max-w-full rounded-lg p-4 flex flex-col gap-2 transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-130 hover:shadow-2xl">
       <div className="flex justify-between items-center">
         <h1 className="text-sm font-semibold ">Sentiment Trends</h1>
         <div>
