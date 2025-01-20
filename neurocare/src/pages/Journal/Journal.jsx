@@ -1,7 +1,28 @@
+import { useState } from "react";
 import Sidebar from "../../Components/Sidebar/Sidebar";
 import Topbar from "../../Components/Topbar/Topbar";
+import SentimentChart from "../../Components/Charts/LineChart";
+import StressLevels from "../../Components/Charts/BarChart";
+import SentimentCategories from "../../Components/Charts/PieChart";
 
 const Journal = () => {
+  const [selectedChart, setSelectedChart]  = useState("line")
+
+  const renderChart = () => {
+    switch (selectedChart) {
+      case "line":
+        return <SentimentChart />
+      case "bar":
+        return <StressLevels/>
+      case "pie":
+        return <SentimentCategories />
+      default:
+        return null;
+
+    }
+  }
+
+
   const sentiments = [
     {
       id: 1,
@@ -74,7 +95,7 @@ const Journal = () => {
           </div>
 
           <div className="bg-white p-2 rounded-lg ">
-            {sentiments.map((sentiment) => (
+            {sentiments.slice(0, 1).map((sentiment) => (
               <div
                 key={sentiment.id }
                 className="flex flex-row justify-evenly items-center bg-green-500 rounded-lg p-3 w-full"
@@ -91,6 +112,23 @@ const Journal = () => {
                 <div className="font-bold">{sentiment.score}</div>
               </div>
             ))}
+          </div>
+          <div>
+          <h3 className="text-center text-[15px] font-bold">Sentiment Analytics</h3>
+          </div>
+          <div>
+            <div className="flex flex-col gap-3 items-center ">
+              <div className="flex flex-row gap-1">
+                <p className="text-[15px]">Choose chart type : </p>
+                <select name="" value={selectedChart} onChange={(e) => setSelectedChart(e.target.value)} id="" className="rounded-lg text-[15px] p-2 font-light">
+                  <option value="line">Line Chart</option>
+                  <option value="bar">Bar Chart</option>
+                  <option value="pie">Pie Chart</option>
+                </select>
+              </div>
+              <div className="md:w-[90%] w-full">{renderChart()}</div>
+
+            </div>
           </div>
           <div>
           <h3 className="text-center text-[15px] font-bold">Sentiment History</h3>
