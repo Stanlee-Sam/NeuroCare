@@ -14,14 +14,14 @@ const Topbar = () => {
       </div>
       <div className="flex ml-1 space-x-5 items-center">
         <div className="relative">
-          <FaBell />
+          <FaBell className="cursor-pointer" />
           <div className="absolute bottom-4 right-0 text-sm bg-red-600 w-2 h-2 rounded-full animate-pulse">
             
           </div>
         </div>
         <div className="w-8">
           <img
-            className="w-full rounded-full"
+            className="w-full rounded-full cursor-pointer "
             src="../../../src/assets/avatar.jpg"
             alt=""
           />

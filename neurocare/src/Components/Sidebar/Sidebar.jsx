@@ -14,7 +14,7 @@ const Sidebar = () => {
     <div className=" fixed top-0 left-0 z-50 h-full">
       <div
         className={`${
-          open ? "w-72" : "w-[50px]"
+          open ? "md:w-72" : "w-[50px]"
         } duration-300 h-full  bg-[#77DD77] relative sm:w-[40px] md:w-[60px]`}
       >
         <img
