@@ -1,6 +1,7 @@
 "use client";
 
 import { SlOptions } from "react-icons/sl";
+import { useState } from "react";
 
 import {
   BarChart,
@@ -14,7 +15,21 @@ import {
   Cell,
 } from "recharts";
 
-const data = [
+const dataDaily = [
+  { name: "12 AM", Level: 50 },
+  { name: "2 AM", Level: 81 },
+  { name: "4 AM", Level: 24 },
+  { name: "6 AM", Level: 27 },
+  { name: "8 AM", Level: 89 },
+  { name: "10 AM", Level: 80 },
+  { name: "12 PM", Level: 50 },
+  { name: "2 PM", Level: 81 },
+  { name: "4 PM", Level: 24 },
+  { name: "6 PM", Level: 27 },
+  { name: "8 PM", Level: 89 },
+  { name: "10 PM", Level: 80 },
+];
+const dataWeekly = [
   {
     name: "Sun",
     Level: 50,
@@ -42,6 +57,25 @@ const data = [
   {
     name: "Sat",
     Level: 50,
+  },
+];
+
+const dataMonthly = [
+  {
+    name: "Week 1",
+    Level: 50,
+  },
+  {
+    name: "Week 2",
+    Level: 81,
+  },
+  {
+    name: "Week 3",
+    Level: 24,
+  },
+  {
+    name: "Week 4",
+    Level: 27,
   },
 ];
 
@@ -119,10 +153,36 @@ const CustomLegend = () => {
 };
 
 const StressLevels = () => {
+  const [timeSpan, setTimeSpan] = useState("weekly");
+
+  const getData = () => {
+    switch (timeSpan) {
+      case "daily":
+        return dataDaily;
+      case "monthly":
+        return dataMonthly;
+      default:
+        return dataWeekly;
+    }
+  };
+
+  const data = getData();
+
   return (
-    <div className="bg-white max-w-full  rounded-lg p-4 flex flex-col gap-2 transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-130 hover:shadow-2xl">
+    <div className="bg-white max-w-full  rounded-lg p-4 flex flex-col gap-2 transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-130 hover:shadow-2xl ">
       <div className="flex justify-between items-center">
         <h1 className="text-sm font-semibold ">Stress Levels</h1>
+        <div className="flex justify-end mb-2">
+          <select
+            value={timeSpan}
+            onChange={(e) => setTimeSpan(e.target.value)}
+            className="p-2 rounded-lg border border-gray-300 text-sm cursor-pointer hover:bg-black hover:text-white"
+          >
+            <option value="daily">Daily</option>
+            <option value="weekly">Weekly</option>
+            <option value="monthly">Monthly</option>
+          </select>
+        </div>
         <div>
           <SlOptions />
         </div>
@@ -146,14 +206,18 @@ const StressLevels = () => {
             fontWeight={500}
             axisLine={false}
             tickLine={false}
-            
           />
           <YAxis
             fontSize={15}
             fontWeight={500}
             axisLine={false}
             tickFormatter={(value) => `${value}%`}
-            label={{value: "Percentage", angle : -90, position : 'insideLeft', fontSize : 14 }}
+            label={{
+              value: "Percentage",
+              angle: -90,
+              position: "insideLeft",
+              fontSize: 14,
+            }}
           />
           <Tooltip content={customTooltip} />
 

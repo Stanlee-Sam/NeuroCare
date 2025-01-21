@@ -74,7 +74,7 @@ const FeautureInteraction = () => {
       
       
       
-      <img className="absolute top-[40%] left-[41.5%] w-[70px]" src="../../../src/assets/features.png" alt="" />
+      <img className="absolute top-[40%] left-[41.5%] w-[70px] " src="../../../src/assets/features.png" alt="" />
       <div className="grid grid-cols-2 gap-1">
         <div className="flex items-center gap-1">
           <div className="w-2 h-2 bg-[#8884d8] rounded-lg"></div>
