@@ -11,7 +11,7 @@ const Sidebar = () => {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className=" fixed top-0 left-0 z-50 h-full">
+    <div className=" fixed top-0 left-0 z-50 h-screen">
       <div
         className={`${
           open ? "md:w-72" : "w-[50px]"
@@ -28,7 +28,7 @@ const Sidebar = () => {
           className={`
                 ${
                   !open && "rotate-180"
-                } w-7 absolute top-6 -right-3 cursor-pointer rounded-full border-2 border-[#77DD77]`}
+                } w-7 absolute top-6 -right-3 cursor-pointer rounded-full border-2 border-[#77DD77] `}
           src="../../../../src/assets/left-arrow.jpg"
           alt=""
           onClick={() => setOpen(!open)}
