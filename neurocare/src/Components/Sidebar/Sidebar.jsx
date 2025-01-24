@@ -11,11 +11,11 @@ const Sidebar = () => {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className=" fixed top-0 left-0 z-50 h-screen">
+    <div className=" fixed top-0 z-50 left-0 h-screen">
       <div
         className={`${
-          open ? "md:w-72" : "w-[50px]"
-        } duration-300 h-full  bg-[#77DD77] relative sm:w-[40px] md:w-[60px]`}
+          open ? "w-72" : "w-[50px]"
+        } duration-300 h-full  bg-[#77DD77] relative sm:w-[40px] `}
       >
         <img
           className={`${

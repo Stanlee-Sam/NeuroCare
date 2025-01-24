@@ -43,11 +43,11 @@ const NeuroBot = () => {
               </div>
             ) : (
               <div>
-                <div className="space-y-4 md:h-[20vh] flex flex-col items-center ">
+                <div className="space-y-4 md:h-[20vh] flex flex-col items-center p-4 ">
                   <h1 className="font-bold text-4xl">
                     Hello, <span className="text-[#608BC1]">Dev</span>
                   </h1>
-                  <p className="font-light text-[15px] text-center">
+                  <p className="font-light text-[20px] font-semibold text-center">
                     Welcome to NeuroBot! 🌱 Take a moment to explore helpful
                     tips and insights before starting your conversation.
                   </p>
