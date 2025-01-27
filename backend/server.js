@@ -1,0 +1,27 @@
+const express = require("express");
+const cors = require("cors");
+const { PrismaClient } = require("@prisma/client");
+const dotenv = require("dotenv");
+const sentimentRoutes = require('./routes/sentiment.routes.js')
+const journalRoutes = require('./routes/journal.routes.js')
+
+dotenv.config();
+const app = express();
+const prisma = new PrismaClient();
+
+app.use(cors());
+app.use(express.json());
+
+app.get("/", (req, res) => {
+  res.send("Backend is running!");
+});
+
+//Routes
+app.use('/api', sentimentRoutes);
+app.use('/api', journalRoutes);
+
+
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`);
+});
