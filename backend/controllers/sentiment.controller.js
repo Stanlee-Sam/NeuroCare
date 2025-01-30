@@ -1,4 +1,4 @@
-const { analyzeSentiment } = require('../services/sentiment.service');
+const { analyzeSentiment } = require("../services/sentiment.service");
 
 exports.analyzeSentiment = async (req, res, next) => {
   try {
@@ -6,6 +6,6 @@ exports.analyzeSentiment = async (req, res, next) => {
     const sentiment = await analyzeSentiment(text);
     res.json(sentiment);
   } catch (err) {
-    next(err);  
+    next(err);
   }
 };

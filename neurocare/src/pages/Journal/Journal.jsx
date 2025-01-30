@@ -1,13 +1,44 @@
 import { useState } from "react";
 import Sidebar from "../../Components/Sidebar/Sidebar";
-import Topbar from "../../Components/Topbar/Topbar";
+// import Topbar from "../../Components/Topbar/Topbar";
 import SentimentChart from "../../Components/Charts/LineChart";
 import StressLevels from "../../Components/Charts/BarChart";
 import SentimentCategories from "../../Components/Charts/PieChart";
 import Cards from "../../Components/Tiltcards/TiltCard";
+import { toast } from "react-toastify";
 
 const Journal = () => {
   const [selectedChart, setSelectedChart] = useState("line");
+  //state to store input
+  const [text, setText] = useState("");
+  //state to store sentiment analysis result
+  const [sentimentResult, setSentimentResult] = useState(null);
+
+  const [loading, setLoading] = useState(false);
+
+  const analyzeSentiment = async (e) => {
+    e.preventDefault();
+    if (!text.trim())
+      return toast.info("Please enter some text to analyze sentiment");
+    toast.info("Analyzing sentiment...");
+
+    setLoading(true);
+
+    try {
+      const response = await fetch("http://localhost:5000/api/analyze", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text }),
+      });
+      const data = await response.json();
+      setSentimentResult(data);
+    } catch (error) {
+      console.error("Error analyzing sentiment", error);
+      toast.error("Failed to analyze sentiment. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const renderChart = () => {
     switch (selectedChart) {
@@ -22,45 +53,13 @@ const Journal = () => {
     }
   };
 
-  const sentiments = [
-    {
-      id: 1,
-      emoji: "🙂",
-      type: "Positive",
-      date: "24th Nov 2024",
-      time: "10:30 AM",
-      sentiment: "You seem to be feeling positive today!",
-      desc: "Keep up the great work",
-      score: 8 / 10,
-    },
-    {
-      id: 2,
-      emoji: "😐",
-      type: "Neutral",
-      date: "23th Nov 2024",
-      time: "12:30 PM",
-      sentiment: "Your feeling neutral today!",
-      desc: "Let's see how tomorrow feels",
-      score: 5 / 10,
-    },
-    {
-      id: 3,
-      emoji: "😔",
-      type: "Negative",
-      date: "22nd Nov 2024",
-      time: "9:30 AM",
-      sentiment: "It looks like you're feeling down.Take care!",
-      desc: "Remember, it's ok to feel this way.Take a break",
-      score: 2 / 10,
-    },
-  ];
   return (
     <div className="flex bg-[#D9D9D9]  ">
       <Sidebar />
       <div className="p-4 text-2xl  flex-1 w-full ">
-        <div>
+        {/* <div>
           <Topbar />
-        </div>
+        </div> */}
         <div className="pl-10 md:pl-14 flex flex-col gap-3">
           <div>
             <h1 className="text-center text-[20px] font-bold">
@@ -78,40 +77,86 @@ const Journal = () => {
               </p>
             </div>
             <div>
-              <input
-                className="bg-gray-700 text-white w-full rounded-lg text-[12px] min-h-[30vh] p-2 "
-                placeholder="Write a note...(e.g, I'm feeling stressed about work today)"
-              ></input>
+              <form
+                action=""
+                method="post"
+                className="flex flex-col gap-3"
+                onSubmit={analyzeSentiment}
+              >
+                <textarea
+                  className="bg-gray-700 text-white w-full rounded-lg text-[12px] min-h-[30vh] p-2 resize-none "
+                  placeholder="Write a note...(e.g, I'm feeling stressed about work today)"
+                  value={text}
+                  onChange={(e) => setText(e.target.value)}
+                ></textarea>
+                <div className="grid justify-end items-center ">
+                  <button
+                    type="submit"
+                    className="bg-[#77DD77] text-[15px] p-2 rounded-lg font-bold hover:bg-[#608BC1] hover:text-white "
+                  >
+                    Analyze
+                  </button>
+                </div>
+              </form>
             </div>
-            <div className="grid justify-end items-center ">
-              <button className="bg-[#77DD77] text-[15px] p-2 rounded-lg font-bold hover:bg-[#608BC1] hover:text-white ">
-                Analyze
-              </button>
-            </div>
-          </div>
-          <div>
-            <h3 className="text-center text-[15px] font-bold">Feedback</h3>
           </div>
 
-          <div className="bg-white p-2 rounded-lg ">
-            {sentiments.slice(0, 1).map((sentiment) => (
-              <div
-                key={sentiment.id}
-                className="flex flex-row justify-evenly items-center bg-green-500 rounded-lg p-3 w-full"
-              >
-                <div className="text-[30px]">{sentiment.emoji}</div>
+          {sentimentResult &&
+            (loading ? (
+              <div className="flex justify-center items-center p-4">
+                <div
+                  className="spinner"
+    
+                >
+                  <span className="sr-only">Loading...</span>
+                </div>
+              </div>
+            ) : (
+              <div>
                 <div>
-                  <div className="font-bold text-[20px] text-center">
-                    {sentiment.sentiment}
-                  </div>
-                  <div className="text-center text-[15px]">
-                    {sentiment.desc}
+                  <h3 className="text-center text-[15px] font-bold">
+                    Feedback
+                  </h3>
+                </div>
+                <div className="bg-white p-2 rounded-lg ">
+                  <div
+                    className={`${
+                      sentimentResult.compound > 0
+                        ? "bg-[#1BA739]"
+                        : sentimentResult.compound < 0
+                        ? "bg-[#B20E0E]"
+                        : "bg-[#A76A1B]"
+                    } flex flex-row justify-evenly items-center  rounded-lg p-3 w-full `}
+                  >
+                    <div className="text-[30px]">
+                      {sentimentResult.compound > 0
+                        ? "🙂"
+                        : sentimentResult.compound < 0
+                        ? "😔"
+                        : "😐"}
+                    </div>
+                    <div>
+                      <div className="font-bold text-[20px] text-center">
+                        {sentimentResult.compound > 0
+                          ? "Positive"
+                          : sentimentResult.compound < 0
+                          ? "Negative"
+                          : "Neutral"}
+                      </div>
+                      <div className="text-center text-[15px]">
+                        {sentimentResult.compound > 0
+                          ? "Keep up the great work!"
+                          : sentimentResult.compound < 0
+                          ? "Remember, it's okay to feel this way. Take a break."
+                          : "Let's see how tomorrow feels!"}
+                      </div>
+                    </div>
+                    <div className="font-bold">{sentimentResult.compound}</div>
                   </div>
                 </div>
-                <div className="font-bold">{sentiment.score}</div>
               </div>
             ))}
-          </div>
+
           <div>
             <h3 className="text-center text-[15px] font-bold">
               Sentiment Analytics
@@ -141,8 +186,6 @@ const Journal = () => {
               Sentiment History
             </h3>
           </div>
-          
-          
         </div>
         <div>
           <Cards />

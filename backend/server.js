@@ -18,7 +18,7 @@ app.get("/", (req, res) => {
 
 //Routes
 app.use('/api', sentimentRoutes);
-app.use('/api', journalRoutes);
+app.use('/api/journal', journalRoutes);
 
 
 const PORT = process.env.PORT || 5000;

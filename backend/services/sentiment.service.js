@@ -1,11 +1,6 @@
-// // const { OpenAI } = require('openai');
-// const openai = new OpenAI({ apiKey: 'your-api-key' });
+const vader = require('vader-sentiment');
 
-// exports.analyzeSentiment = async (text) => {
-//   const response = await openai.completions.create({
-//     model: 'text-davinci-003',
-//     prompt: `Analyze the sentiment of this text: "${text}"`,
-//     max_tokens: 60,
-//   });
-//   return response.choices[0].text;
-// };
+exports.analyzeSentiment = async (text) => {
+  const intensity = vader.SentimentIntensityAnalyzer.polarity_scores(text);
+  return intensity;
+};

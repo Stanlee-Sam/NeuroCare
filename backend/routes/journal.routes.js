@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const journalController = require('../controllers/journal.controller.js');
+const journalEntryController = require('../controllers/journal.controller.js');
+const journalEntryMiddleware = require('../middleware/journal.middleware.js');
 
-router.get('/journal', journalController.getJournalEntries);
+router.post('/create', journalEntryMiddleware.validateJournalEntry, journalEntryController.saveJournalEntry);
 
-router.post('/journal', journalController.saveJournalEntry);
+router.get('/', journalEntryController.getJournalEntries);
 
 module.exports = router;

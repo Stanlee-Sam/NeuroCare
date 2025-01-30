@@ -7,9 +7,11 @@ import Journal from "./pages/Journal/Journal";
 import NeuroBot from "./pages/Neurobot/NeuroBot";
 import Resources from "./pages/Resources/Resources";
 import Settings from "./pages/SettingsProfile/Settings";
+import { ToastContainer } from 'react-toastify';
 const App = () => {
   return (
-    <Router>
+    <div>
+      <Router>
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<Login />} />
@@ -27,6 +29,8 @@ const App = () => {
 
       </Routes>
     </Router>
+    <ToastContainer />
+    </div>
   );
 };
 

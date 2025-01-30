@@ -11,11 +11,12 @@ exports.getJournalEntries = async (req, res, next) => {
 
 exports.saveJournalEntry = async (req, res, next) => {
     try {
-      const { entry, sentimentScore, userId } = req.body; 
-      if (!userId) {
-        return res.status(400).json({ error: "User ID is required" }); 
+      const { entry, sentimentScore, sentiment, userId } = req.body;
+      if (!sentiment) {
+        return res.status(400).json({ error: "Sentiment is required" });
       }
-      const savedEntry = await saveJournalEntry(entry, sentimentScore, userId);
+      const savedEntry = await saveJournalEntry(entry, sentimentScore, sentiment, userId);
+      
       res.status(201).json(savedEntry);
     } catch (err) {
       next(err);
