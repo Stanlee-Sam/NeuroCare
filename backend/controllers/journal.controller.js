@@ -9,18 +9,24 @@ exports.getJournalEntries = async (req, res, next) => {
   }
 };
 
-exports.saveJournalEntry = async (req, res, next) => {
-    try {
-      const { entry, sentimentScore, sentiment, userId } = req.body;
-      if (!sentiment) {
-        return res.status(400).json({ error: "Sentiment is required" });
-      }
-      const savedEntry = await saveJournalEntry(entry, sentimentScore, sentiment, userId);
-      
-      res.status(201).json(savedEntry);
-    } catch (err) {
-      next(err);
+exports.saveJournalEntry = async (req, res, next) => {  
+  try {
+    const { text, sentiment, sentimentScore, userId } = req.body;
+
+    if (!text || sentiment === undefined || sentimentScore === undefined || !userId) {
+      return res.status(400).json({ error: "Text, sentimentScore, and userId are required fields." });
     }
-  };
+
+    console.log("Received Data:", req.body);  
+
+    const savedEntry = await saveJournalEntry(text, sentiment, sentimentScore, userId);
+
+    res.status(201).json(savedEntry);
+  } catch (err) {
+    console.error("Error saving journal entry:", err);
+    next(err); 
+  }
+};
+
   
   

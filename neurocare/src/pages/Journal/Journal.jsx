@@ -9,12 +9,34 @@ import { toast } from "react-toastify";
 
 const Journal = () => {
   const [selectedChart, setSelectedChart] = useState("line");
-  //state to store input
   const [text, setText] = useState("");
-  //state to store sentiment analysis result
   const [sentimentResult, setSentimentResult] = useState(null);
 
   const [loading, setLoading] = useState(false);
+
+  const saveJournalEntry = async (text, sentiment, sentimentScore, userId) => {
+    try {
+      const requestBody = { text, sentiment, sentimentScore, userId };
+    console.log("Saving Journal Entry:", requestBody);
+
+    const response = await fetch("http://localhost:5000/api/journal/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(requestBody),
+      });
+      const data = await response.json();
+      console.log("Response from server",data)
+      if(response.ok){
+        toast.success("Journal entry saved successfully");
+      }else {
+        toast.error(data.error || "Failed to save journal entry. Please try again.");
+      }
+
+    } catch (error) {
+      console.error("Error saving journal entry", error);
+      toast.error("Failed to save journal entry. Please try again.");
+    }
+  }
 
   const analyzeSentiment = async (e) => {
     e.preventDefault();
@@ -28,10 +50,21 @@ const Journal = () => {
       const response = await fetch("http://localhost:5000/api/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text }),
+        body: JSON.stringify({ text })
       });
+
+      if(response.ok){
+        
+        toast.error("Failed to analyze sentiment. Please try again.");
+
+      } 
       const data = await response.json();
       setSentimentResult(data);
+
+      const sentimentLabel = data.compound > 0 ? "Positive" : data.compound < 0 ? "Negative" : "Neutral";
+        await saveJournalEntry(text, sentimentLabel, data.compound, 1);
+
+
     } catch (error) {
       console.error("Error analyzing sentiment", error);
       toast.error("Failed to analyze sentiment. Please try again.");
