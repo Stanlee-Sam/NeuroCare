@@ -9,6 +9,8 @@ import Sidebar from "../../Components/Sidebar/Sidebar";
 import Topbar from "../../Components/Topbar/Topbar";
 import { BiSolidUpArrow } from "react-icons/bi";
 import { FaArrowTrendUp } from "react-icons/fa6";
+import { useEffect, useState } from "react";
+
 
 import PropTypes from 'prop-types';
 
@@ -16,13 +18,43 @@ function Number({ n }) {
   const { number } = useSpring({
     from: { number: 0 },
     number: n,
-    delay: 500,
+    delay: 1000,
     config: { mass: 1, tension: 20, friction: 10 },
   });
   return <animated.div>{number.to((n) => n.toFixed(0))}</animated.div>;
 }
 
 const Dashboard = () => {
+
+  const [journalEntries, setJournalEntries] = useState([]);
+  // const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+
+  useEffect(() => {
+      const fetchJournalEntries = async () => {
+        try {
+          const response = await fetch("http://localhost:5000/api/journal");
+          if(!response.ok){
+            throw new Error("Network response was not ok");
+          }
+          const data = await response.json();
+          console.log("Journal Entries:", data);
+  
+           const sortedData = data.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+        setJournalEntries(sortedData);
+      } catch (error) {
+        console.error("Error fetching journal entries", error);
+        setError("Failed to fetch journal entries. Please try again.");
+      } finally {
+        // setLoading(false);
+      }
+    };
+  
+      fetchJournalEntries();
+    }, []);
+
+    if (error) return <p>Error : {error}</p>
+  
   return (
     <div className="flex bg-[#D9D9D9]">
       <Sidebar />
@@ -119,7 +151,7 @@ const Dashboard = () => {
                 <div className="toggleButton"></div>
                 <div className="flex flex-col md:grid md:grid-cols-2 gap-2 w-full ">
                   <div className="line-chart ">
-                    <SentimentChart />
+                    <SentimentChart journalEntries = {journalEntries}/>
                   </div>
                   <div className="bar-chart">
                     <StressLevels />

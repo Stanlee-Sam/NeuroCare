@@ -8,11 +8,38 @@ exports.getJournalEntries = async () => {
       orderBy: {
         createdAt: 'desc'
       },
-      take : 3,
+      // take : 3,
     });
     return entries;
   } catch (err) {
     throw new Error("Error fetching journal entries: " + err.message);
+  }
+};
+
+exports.getRecentJournalEntries = async () => {
+  try {
+    const entries = await prisma.journalEntry.findMany({
+      orderBy: {
+        createdAt: 'desc'
+      },
+      take: 3, 
+    });
+    return entries;
+  } catch (err) {
+    throw new Error("Error fetching recent journal entries: " + err.message);
+  }
+};
+
+exports.getAllJournalEntries = async () => {
+  try {
+    const entries = await prisma.journalEntry.findMany({
+      orderBy: {
+        createdAt: 'asc'
+      }
+    });
+    return entries;
+  } catch (err) {
+    throw new Error("Error fetching all journal entries: " + err.message);
   }
 };
 

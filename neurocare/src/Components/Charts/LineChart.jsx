@@ -1,117 +1,8 @@
-// "use client";
-
-// import { SlOptions } from "react-icons/sl";
-
-// import {
-//   LineChart,
-//   Line,
-//   XAxis,
-//   YAxis,
-//   CartesianGrid,
-//   Tooltip,
-//   Legend,
-//   ResponsiveContainer,
-//   ReferenceLine,
-// } from "recharts";
-
-// const data = [
-//   {
-//     name: "Sun",
-//     sentiment: 0,
-//   },
-//   {
-//     name: "Mon",
-//     sentiment: 0.15,
-//   },
-//   {
-//     name: "Tue",
-//     sentiment: 0,
-//   },
-//   {
-//     name: "Wed",
-//     sentiment: -0.35,
-//   },
-//   {
-//     name: "Thur",
-//     sentiment: 0,
-//   },
-//   {
-//     name: "Fri",
-//     sentiment: 0.8,
-//   },
-//   {
-//     name: "Sat",
-//     sentiment: 0,
-//   },
-// ];
-
-// const SentimentChart = () => {
-//   return (
-//     <div className="bg-white max-w-full rounded-lg p-4 flex flex-col gap-2 transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-130 hover:shadow-2xl">
-//       <div className="flex justify-between items-center">
-//         <h1 className="text-sm font-semibold ">Sentiment Trends</h1>
-//         <div>
-//           <SlOptions />
-//         </div>
-//       </div>
-//       <ResponsiveContainer width="100%" height={300}>
-//         <LineChart
-//           width={500}
-//           height={300}
-//           data={data}
-//           margin={{
-//             top: 10,
-//             right: 10,
-//             bottom: 5,
-//           }}
-//         >
-//           <CartesianGrid strokeDasharray="3 3" vertical={false} />
-//           <XAxis
-//             dataKey="name"
-//             fontSize={15}
-//             fontWeight={500}
-//             axisLine={{ stroke: "#dcdcdc" }}
-//             tickLine={false}
-
-//           />
-//           <YAxis
-//             fontSize={15}
-//             fontWeight={500}
-//             domain={[-1, 1]}
-//             axisLine={{ stroke: "#dcdcdc" }}
-//             tickLine={false}
-//             label={{
-//               value: "Sentiment",
-//               angle: -90,
-//               position: "insideLeft",
-//               fontSize: 14,
-//             }}
-//           />
-//           <ReferenceLine y={0} stroke="#000" strokeWidth={2} />
-//           <Tooltip
-//             cursor={{ stroke: "#ccc", strokeWidth: 2 }}
-//             contentStyle={{ borderRadius: "10px", background: "#fff", fontWeight : "500" }}
-//           />
-//           <Legend wrapperStyle={{ fontSize: "10px", fontWeight: "500" }} />
-//           <Line
-//             type="monotone"
-//             dataKey="sentiment"
-//             stroke="#608BC1"
-//             activeDot={{ r: 8 }}
-//           />
-//         </LineChart>
-//       </ResponsiveContainer>
-//     </div>
-//   );
-// };
-
-// export default SentimentChart;
-
 "use client";
 
 import { SlOptions } from "react-icons/sl";
-import { useState } from "react";
-
+import { useState, useMemo, useEffect } from "react";
+import PropTypes from "prop-types";
 import {
   LineChart,
   Line,
@@ -124,79 +15,76 @@ import {
   ReferenceLine,
 } from "recharts";
 
-const dataDaily = [
-  { name: "12 AM", sentiment: 0.6 },
-  { name: "2 AM", sentiment: 0.3 },
-  { name: "4 AM", sentiment: 0.2 },
-  { name: "6 AM", sentiment: 0.1 },
+const SentimentChart = ({ journalEntries = [] }) => {
+  const [timeSpan, setTimeSpan] = useState("daily");
 
-  { name: "8 AM", sentiment: 0.3 },
-  { name: "10 AM", sentiment: 0.2 },
-  { name: "12 PM", sentiment: -0.1 },
-  { name: "2 PM", sentiment: 0.5 },
-  { name: "4 PM", sentiment: -0.3 },
-  { name: "6 PM", sentiment: 0.8 },
-  { name: "8 PM", sentiment: 0.4 },
-  { name: "10 PM", sentiment: 0.8 },
-];
+  useEffect(() => {
+    console.log("Journal Entries Updated:", journalEntries);
+  }, [journalEntries]);
 
-const dataWeekly = [
-  {
-    name: "Sun",
-    sentiment: 0,
-  },
-  {
-    name: "Mon",
-    sentiment: 0.15,
-  },
-  {
-    name: "Tue",
-    sentiment: 0,
-  },
-  {
-    name: "Wed",
-    sentiment: -0.35,
-  },
-  {
-    name: "Thur",
-    sentiment: 0,
-  },
-  {
-    name: "Fri",
-    sentiment: 0.8,
-  },
-  {
-    name: "Sat",
-    sentiment: 0,
-  },
-];
+  useEffect(() => {
+    setTimeSpan("daily"); 
+  }, [journalEntries]);
 
-const dataMonthly = [
-  { name: "Week 1", sentiment: 0.2 },
-  { name: "Week 2", sentiment: -0.1 },
-  { name: "Week 3", sentiment: 0.4 },
-  { name: "Week 4", sentiment: 0.3 },
-];
+  const formatData = (entries, period) => {
+    console.log("Entries received in formatData:", entries);
+    const groupedData = {};
 
-const SentimentChart = () => {
-  const [timeSpan, setTimeSpan] = useState("weekly");
+    entries.forEach((entry) => {
+      console.log("Processing entry:", entry);
+      const date = new Date(entry.createdAt);
 
-  const getData = () => {
-    switch (timeSpan) {
-      case "daily":
-        return dataDaily;
+      const localDate = new Date(date.toLocaleString("en-US", { timeZone: "Africa/Nairobi" }));
 
-      case "monthly":
-        return dataMonthly;
-      default:
-        return dataWeekly;
-    }
+      let key;
+      if (period === "daily") {
+        key = `${localDate.getHours()}:00`; 
+      } else if (period === "weekly") {
+        const weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+        key = weekdays[localDate.getDay()]; 
+      } else if (period === "monthly") {
+        key = `Week ${Math.ceil(localDate.getDate() / 7)}`; 
+      }
+
+      console.log("Grouping Entry:", entry.id, "| Date:", localDate, "| Key:", key);
+
+      if (!groupedData[key]) {
+        groupedData[key] = { name: key, sentiment: 0, count: 0 };
+      }
+      groupedData[key].sentiment += entry.sentimentScore;
+      groupedData[key].count += 1;
+    });
+
+    const formattedData = Object.values(groupedData).map((item) => ({
+      name: item.name,
+      sentiment: item.count > 0 ? Number((item.sentiment / item.count).toFixed(2)) : 0,
+    }))
+    .sort((a, b) => a.name.localeCompare(b.name)); 
+
+    console.log("Formatted Data:", formattedData);
+    return formattedData;
   };
+
+  const chartData = useMemo(() => {
+    console.log("Processing journalEntries:", journalEntries);
+    if (journalEntries.length > 0) {
+      // Ensure data is sorted by createdAt (ascending)
+      const sortedEntries = [...journalEntries].sort(
+        (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
+      );
+  
+      return formatData(sortedEntries, timeSpan);
+    }
+  
+    return [{ name: "No Data" }];
+  }, [journalEntries, timeSpan]);
+
+  console.log("Chart Data Before Render:", chartData);
 
   return (
     <div className="bg-white max-w-full rounded-lg p-4 flex flex-col gap-2 transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-130 hover:shadow-2xl">
       <div className="flex justify-between items-center">
-        <h1 className="text-sm font-semibold ">Sentiment Trends</h1>
+        <h1 className="text-sm font-semibold">Sentiment Trends</h1>
         <div className="flex justify-end mb-2">
           <select
             value={timeSpan}
@@ -214,57 +102,59 @@ const SentimentChart = () => {
       </div>
 
       <ResponsiveContainer width="100%" height={300}>
-        <LineChart
-          width={500}
-          height={300}
-          data={getData()}
-          margin={{
-            top: 10,
-            right: 10,
-            bottom: 5,
-          }}
-        >
-          <CartesianGrid strokeDasharray="3 3" vertical={false} />
-          <XAxis
-            dataKey="name"
-            fontSize={15}
-            fontWeight={500}
-            axisLine={{ stroke: "#dcdcdc" }}
-            tickLine={false}
-          />
-          <YAxis
-            fontSize={15}
-            fontWeight={500}
-            domain={[-1, 1]}
-            axisLine={{ stroke: "#dcdcdc" }}
-            tickLine={false}
-            label={{
-              value: "Sentiment",
-              angle: -90,
-              position: "insideLeft",
-              fontSize: 14,
-            }}
-          />
-          <ReferenceLine y={0} stroke="#000" strokeWidth={2} />
-          <Tooltip
-            cursor={{ stroke: "#ccc", strokeWidth: 2 }}
-            contentStyle={{
-              borderRadius: "10px",
-              background: "#fff",
-              fontWeight: "500",
-            }}
-          />
-          <Legend wrapperStyle={{ fontSize: "10px", fontWeight: "500" }} />
-          <Line
-            type="monotone"
-            dataKey="sentiment"
-            stroke="#608BC1"
-            activeDot={{ r: 8 }}
-          />
-        </LineChart>
+        {chartData.length > 0 ? (
+          <LineChart
+            data={chartData}
+            margin={{ top: 10, right: 10, bottom: 5 }}
+          >
+            <CartesianGrid strokeDasharray="3 3" vertical={false} />
+            <XAxis
+              dataKey="name"
+              fontSize={15}
+              fontWeight={500}
+              axisLine={{ stroke: "#dcdcdc" }}
+              tickLine={false}
+            />
+            <YAxis
+              fontSize={15}
+              fontWeight={500}
+              domain={[-1, 1]}
+              axisLine={{ stroke: "#dcdcdc" }}
+              tickLine={false}
+              label={{
+                value: "Sentiment",
+                angle: -90,
+                position: "insideLeft",
+                fontSize: 14,
+              }}
+            />
+            <ReferenceLine y={0} stroke="#000" strokeWidth={2} />
+            <Tooltip
+              cursor={{ stroke: "#ccc", strokeWidth: 2 }}
+              contentStyle={{
+                borderRadius: "10px",
+                background: "#fff",
+                fontWeight: "500",
+              }}
+            />
+            <Legend wrapperStyle={{ fontSize: "10px", fontWeight: "500" }} />
+            <Line type="monotone" dataKey="sentiment" stroke="#608BC1" activeDot={{ r: 8 }} />
+          </LineChart>
+        ) : (
+          <p className="text-center">No data available yet....</p>
+        )}
       </ResponsiveContainer>
     </div>
   );
+};
+
+SentimentChart.propTypes = {
+  journalEntries: PropTypes.arrayOf(
+    PropTypes.shape({
+      createdAt: PropTypes.string.isRequired,
+      sentimentScore: PropTypes.number.isRequired,
+    })
+  ),
 };
 
 export default SentimentChart;

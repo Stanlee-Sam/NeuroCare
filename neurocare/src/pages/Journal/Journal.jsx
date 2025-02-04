@@ -1,4 +1,6 @@
-import { useState } from "react";
+
+
+import { useState, useEffect } from "react";
 import Sidebar from "../../Components/Sidebar/Sidebar";
 // import Topbar from "../../Components/Topbar/Topbar";
 import SentimentChart from "../../Components/Charts/LineChart";
@@ -12,7 +14,9 @@ const Journal = () => {
   const [text, setText] = useState("");
   const [sentimentResult, setSentimentResult] = useState(null);
 
-  const [loading, setLoading] = useState(false);
+  const [journalEntries, setJournalEntries] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   const saveJournalEntry = async (text, sentiment, sentimentScore, userId) => {
     try {
@@ -26,11 +30,12 @@ const Journal = () => {
       });
       const data = await response.json();
       console.log("Response from server",data)
-      if(response.ok){
-        toast.success("Journal entry saved successfully");
-      }else {
+      if (!response.ok) { // Fixed condition
         toast.error(data.error || "Failed to save journal entry. Please try again.");
+        return;
       }
+      
+      toast.success("Journal entry saved successfully");
 
     } catch (error) {
       console.error("Error saving journal entry", error);
@@ -52,13 +57,14 @@ const Journal = () => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text })
       });
+      
+      const data = await response.json();
 
-      if(response.ok){
+      if(!response.ok){
         
         toast.error("Failed to analyze sentiment. Please try again.");
 
       } 
-      const data = await response.json();
       setSentimentResult(data);
 
       const sentimentLabel = data.compound > 0 ? "Positive" : data.compound < 0 ? "Negative" : "Neutral";
@@ -73,10 +79,36 @@ const Journal = () => {
     }
   };
 
+  useEffect(() => {
+    const fetchJournalEntries = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/api/journal");
+        if(!response.ok){
+          throw new Error("Network response was not ok");
+        }
+        const data = await response.json();
+        console.log("Journal Entries:", data);
+
+         const sortedData = data.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+      setJournalEntries(sortedData);
+    } catch (error) {
+      console.error("Error fetching journal entries", error);
+      setError("Failed to fetch journal entries. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+    fetchJournalEntries();
+  }, []);
+
+ 
+  if (error) return <p>Error : {error}</p>
+
   const renderChart = () => {
     switch (selectedChart) {
       case "line":
-        return <SentimentChart />;
+        return <SentimentChart journalEntries = {journalEntries} />;
       case "bar":
         return <StressLevels />;
       case "pie":
@@ -137,13 +169,13 @@ const Journal = () => {
           {sentimentResult &&
             (loading ? (
               <div className="flex justify-center items-center p-4">
-                <div
-                  className="spinner"
-    
-                >
-                  <span className="sr-only">Loading...</span>
-                </div>
-              </div>
+        <div
+          className="spinner"
+
+        >
+          <span className="sr-only">Loading...</span>
+        </div>
+      </div>
             ) : (
               <div>
                 <div>

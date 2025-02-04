@@ -1,8 +1,26 @@
-const { getJournalEntries, saveJournalEntry } = require('../services/journal.service');
+const { getJournalEntries, saveJournalEntry, getAllJournalEntries, getRecentJournalEntries } = require('../services/journal.service');
 
 exports.getJournalEntries = async (req, res, next) => {
   try {
     const entries = await getJournalEntries();
+    res.json(entries);
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.getJournalEntriesForChart = async (req, res, next) => {
+  try {
+    const entries = await getAllJournalEntries(); 
+    res.json(entries);
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.getRecentJournalEntriesForHistory = async (req, res, next) => {
+  try {
+    const entries = await getRecentJournalEntries(); 
     res.json(entries);
   } catch (err) {
     next(err);

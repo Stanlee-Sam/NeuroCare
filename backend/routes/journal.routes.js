@@ -6,5 +6,7 @@ const journalEntryMiddleware = require('../middleware/journal.middleware.js');
 router.post('/create', journalEntryMiddleware.validateJournalEntry, journalEntryController.saveJournalEntry);
 
 router.get('/', journalEntryController.getJournalEntries);
+router.get('/chart', journalEntryController.getJournalEntriesForChart); 
+router.get('/history', journalEntryController.getRecentJournalEntriesForHistory); 
 
 module.exports = router;
