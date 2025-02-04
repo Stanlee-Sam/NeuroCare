@@ -1,7 +1,8 @@
 "use client";
 
 import { SlOptions } from "react-icons/sl";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import axios from "axios";
 
 import {
   BarChart,
@@ -80,7 +81,7 @@ const dataMonthly = [
 ];
 
 const customTooltip = ({ active, payload, label }) => {
-  if (active && payload && label) {
+  if (active && payload?.length > 0) {
     return (
       <div
         style={{
@@ -93,19 +94,25 @@ const customTooltip = ({ active, payload, label }) => {
         }}
       >
         <p style={{ fontWeight: 600, marginBottom: 5 }}>{label}</p>
-        <p style={{ color: payload[0].fill, fontWeight: 500 }}>
-          Level: {payload[0].value}%
+        <p style={{ color: payload[0]?.fill || "#000", fontWeight: 500 }}>
+          Level: {payload[0]?.value ?? "N/A"}%
         </p>
       </div>
     );
   }
+  return null;
 };
 
+
 const barColor = (value) => {
-  if (value <= 49) return "#4CAF50";
-  if (value === 50) return "#FFA500";
-  return "#F44336";
+  
+  if (value >= 70) return "#F44336"; 
+  if (value >= 40) return "#FFA500"; 
+  return "#4CAF50"; 
 };
+
+
+
 const CustomLegend = () => {
   return (
     <div
@@ -154,19 +161,112 @@ const CustomLegend = () => {
 
 const StressLevels = () => {
   const [timeSpan, setTimeSpan] = useState("weekly");
+  const [stressData, setStressData] = useState([]);
+ 
+  useEffect(() => {
+    const fetchStressLevels = async () => {
+      try {
+        const response = await axios.get(`http://localhost:5000/api/journal/chart?timeSpan=${timeSpan}`);
+        console.log("Raw API Response:", response.data);
+  
+        
+        if (!response.data || response.data.length === 0) {
+          console.warn("No data returned from API, using fallback dataset.");
+          setStressData(getFallbackData(timeSpan));
+          return;
+        }
+  
+        
+        let aggregatedData = aggregateData(response.data, timeSpan);
+        console.log("Processed Stress Data:", aggregatedData);
+  
+        setStressData(aggregatedData);
+      } catch (error) {
+        console.error("Error fetching stress levels:", error);
+        setStressData(getFallbackData(timeSpan)); 
+      }
+    };
+  
+    fetchStressLevels();
+  }, [timeSpan]);
+  
 
-  const getData = () => {
+  const aggregateData = (data, timeSpan) => {
+    let groupedData = {};
+  
+    data.forEach((entry) => {
+      let key = "Unknown";
+  
+      if (timeSpan === "daily") {
+        key = entry.name;
+      } else if (timeSpan === "weekly") {
+        let date = new Date(entry.createdAt);
+        if (!isNaN(date.getTime())) {
+          key = date.toLocaleDateString("en-US", { weekday: "short" });
+        }
+      } else if (timeSpan === "monthly") {
+        let date = new Date(entry.createdAt);
+        if (!isNaN(date.getTime())) {
+          key = `Week ${Math.ceil(date.getDate() / 7)}`;
+        }
+      }
+  
+      if (!groupedData[key]) {
+        groupedData[key] = { total: 0, count: 0 };
+      }
+  
+      
+      if (typeof entry.Level === "number" && !isNaN(entry.Level)) {
+        let normalizedLevel = Math.min(entry.Level, 100); // Cap at 100
+        groupedData[key].total += normalizedLevel;
+        groupedData[key].count += 1;
+      }
+    });
+  
+    return Object.keys(groupedData).map((key) => {
+      const avgStress = groupedData[key].count > 0 ? groupedData[key].total / groupedData[key].count : 0;
+      return {
+        name: key,
+        Level: Math.round(avgStress), 
+      };
+    });
+  };
+  
+  
+  
+  
+  
+  
+  
+  
+  const getFallbackData = (timeSpan) => {
     switch (timeSpan) {
       case "daily":
         return dataDaily;
+      case "weekly":
+        return dataWeekly;
       case "monthly":
         return dataMonthly;
       default:
-        return dataWeekly;
+        return [];
     }
   };
+  
+  const getData = () => {
+    if (stressData.length > 0) {
+      return stressData.map(entry => ({
+        ...entry,
+        Level: entry.Level || 0, // Ensure Level is always a number
+      }));
+    }
+    return [];
+  };
+  
+  
+  
+  
 
-  const data = getData();
+
 
   return (
     <div className="bg-white max-w-full  rounded-lg p-4 flex flex-col gap-2 transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-130 hover:shadow-2xl ">
@@ -189,9 +289,10 @@ const StressLevels = () => {
       </div>
       <ResponsiveContainer width="100%" height={300}>
         <BarChart
+          key={timeSpan}
           width={500}
           height={300}
-          data={data}
+          data={getData()}
           barSize={20}
           margin={{
             top: 10,
@@ -212,6 +313,7 @@ const StressLevels = () => {
             fontWeight={500}
             axisLine={false}
             tickFormatter={(value) => `${value}%`}
+            domain={[0, 100]}
             label={{
               value: "Percentage",
               angle: -90,
@@ -222,16 +324,13 @@ const StressLevels = () => {
           <Tooltip content={customTooltip} />
 
           <Legend content={<CustomLegend />} />
-          <Bar
-            dataKey="Level"
-            legendType="circle"
-            radius={[10, 10, 0, 0]}
-            fill={({ value }) => barColor(value)}
-          >
-            {data.map((entry, index) => (
-              <Cell key={`cell-${index}`} fill={barColor(entry.Level)} />
-            ))}
-          </Bar>
+          <Bar dataKey="Level" radius={[10, 10, 0, 0]}>
+  {getData().map((entry, index) => (
+    <Cell key={`cell-${index}`} fill={barColor(entry.Level)} />
+  ))}
+</Bar>
+
+
         </BarChart>
       </ResponsiveContainer>
     </div>

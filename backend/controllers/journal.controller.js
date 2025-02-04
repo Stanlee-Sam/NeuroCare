@@ -29,15 +29,16 @@ exports.getRecentJournalEntriesForHistory = async (req, res, next) => {
 
 exports.saveJournalEntry = async (req, res, next) => {  
   try {
-    const { text, sentiment, sentimentScore, userId } = req.body;
+    console.log("Request Body:", req.body);
+    const { text, sentiment, sentimentScore, level, userId } = req.body;
 
-    if (!text || sentiment === undefined || sentimentScore === undefined || !userId) {
+    if (!text || sentiment === undefined || sentimentScore === undefined || !userId || level === undefined) {
       return res.status(400).json({ error: "Text, sentimentScore, and userId are required fields." });
     }
 
     console.log("Received Data:", req.body);  
 
-    const savedEntry = await saveJournalEntry(text, sentiment, sentimentScore, userId);
+    const savedEntry = await saveJournalEntry(text, sentiment, sentimentScore,level, userId);
 
     res.status(201).json(savedEntry);
   } catch (err) {

@@ -18,9 +18,9 @@ const Journal = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const saveJournalEntry = async (text, sentiment, sentimentScore, userId) => {
+  const saveJournalEntry = async (text, sentiment, sentimentScore, level, userId) => {
     try {
-      const requestBody = { text, sentiment, sentimentScore, userId };
+      const requestBody = { text, sentiment, sentimentScore, level, userId };
     console.log("Saving Journal Entry:", requestBody);
 
     const response = await fetch("http://localhost:5000/api/journal/create", {
@@ -30,7 +30,7 @@ const Journal = () => {
       });
       const data = await response.json();
       console.log("Response from server",data)
-      if (!response.ok) { // Fixed condition
+      if (!response.ok) { 
         toast.error(data.error || "Failed to save journal entry. Please try again.");
         return;
       }
@@ -68,7 +68,7 @@ const Journal = () => {
       setSentimentResult(data);
 
       const sentimentLabel = data.compound > 0 ? "Positive" : data.compound < 0 ? "Negative" : "Neutral";
-        await saveJournalEntry(text, sentimentLabel, data.compound, 1);
+        await saveJournalEntry(text, sentimentLabel, data.compound, 1, 1);
 
 
     } catch (error) {

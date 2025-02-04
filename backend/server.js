@@ -4,6 +4,7 @@ const { PrismaClient } = require("@prisma/client");
 const dotenv = require("dotenv");
 const sentimentRoutes = require('./routes/sentiment.routes.js')
 const journalRoutes = require('./routes/journal.routes.js')
+const bodyParser = require('body-parser');
 
 dotenv.config();
 const app = express();
@@ -11,6 +12,7 @@ const prisma = new PrismaClient();
 
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 app.get("/", (req, res) => {
   res.send("Backend is running!");
