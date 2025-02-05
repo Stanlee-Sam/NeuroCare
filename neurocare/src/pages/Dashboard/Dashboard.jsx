@@ -10,9 +10,11 @@ import Topbar from "../../Components/Topbar/Topbar";
 import { BiSolidUpArrow } from "react-icons/bi";
 import { FaArrowTrendUp } from "react-icons/fa6";
 import { useEffect, useState } from "react";
+import StressProgressBar from "../../Components/ProgressBar/StressProgressBar";
 
 
 import PropTypes from 'prop-types';
+// import axios from "axios";
 
 function Number({ n }) {
   const { number } = useSpring({
@@ -27,9 +29,11 @@ function Number({ n }) {
 const Dashboard = () => {
 
   const [journalEntries, setJournalEntries] = useState([]);
+  const [averageStress, setAverageStress] = useState(0);
   // const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
+  
   useEffect(() => {
       const fetchJournalEntries = async () => {
         try {
@@ -52,6 +56,22 @@ const Dashboard = () => {
   
       fetchJournalEntries();
     }, []);
+    useEffect(() => {
+      // Function to calculate average stress level for today
+      const calculateAverageStress = (entries) => {
+        if (entries.length === 0) return 0;
+        const totalStress = entries.reduce((sum, entry) => sum + entry.level, 0);
+        return Math.round(totalStress / entries.length);
+      };
+  
+      // Filter entries for today
+      const todayEntries = journalEntries.filter((entry) => {
+        const entryDate = new Date(entry.createdAt).toDateString();
+        return entryDate === new Date().toDateString();
+      });
+  
+      setAverageStress(calculateAverageStress(todayEntries));
+    }, [journalEntries]);
 
     if (error) return <p>Error : {error}</p>
   
@@ -136,7 +156,9 @@ const Dashboard = () => {
                       Stress Levels
                     </h3>
                     <div className="progress-bar bg-gray-500 h-[15px] rounded-lg">
-                      <div className="bg-red-600 h-full rounded-lg hover:animate-pulse w-[80%] "></div>
+                      <div className=" h-full rounded-lg hover:animate-pulse w-full ">
+                        <StressProgressBar stressPercentage={averageStress} />
+                      </div>
                     </div>
                     <div className="flex justify-between text-[10px] ">
                       <p>Low</p>
