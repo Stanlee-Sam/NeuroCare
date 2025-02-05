@@ -65,10 +65,16 @@ const Journal = () => {
         toast.error("Failed to analyze sentiment. Please try again.");
 
       } 
+      console.log("Received Sentiment Data:", data); 
       setSentimentResult(data);
 
-      const sentimentLabel = data.compound > 0 ? "Positive" : data.compound < 0 ? "Negative" : "Neutral";
-        await saveJournalEntry(text, sentimentLabel, data.compound, 1, 1);
+      const sentimentLabel = data.compound > 0.2 
+      ? "Positive" 
+      : data.compound < -0.2 
+      ? "Negative" 
+      : "Neutral";
+      
+      await saveJournalEntry(text, sentimentLabel, data.compound, 1, 1);
 
 
     } catch (error) {

@@ -160,7 +160,7 @@ const CustomLegend = () => {
 };
 
 const StressLevels = () => {
-  const [timeSpan, setTimeSpan] = useState("weekly");
+  const [timeSpan, setTimeSpan] = useState("daily");
   const [stressData, setStressData] = useState([]);
  
   useEffect(() => {
