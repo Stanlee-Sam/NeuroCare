@@ -8,6 +8,8 @@ import StressLevels from "../../Components/Charts/BarChart";
 import SentimentCategories from "../../Components/Charts/PieChart";
 import Cards from "../../Components/Tiltcards/TiltCard";
 import { toast } from "react-toastify";
+import { trackFeatureUsage } from "../../../utils/FeatureInteraction.js"
+
 
 const Journal = () => {
   const [selectedChart, setSelectedChart] = useState("line");
@@ -17,6 +19,10 @@ const Journal = () => {
   const [journalEntries, setJournalEntries] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  useEffect(() => {
+    trackFeatureUsage("Mood Tracking")
+  }, []);
 
   const saveJournalEntry = async (text, sentiment, sentimentScore, level, userId) => {
     try {
@@ -219,7 +225,7 @@ const Journal = () => {
                           ? "Keep up the great work!"
                           : sentimentResult.compound < 0
                           ? "Remember, it's okay to feel this way. Take a break."
-                          : "Let's see how tomorrow feels!"}
+                          : "Let's see how later feels!"}
                       </div>
                     </div>
                     <div className="font-bold">{sentimentResult.compound}</div>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Sidebar from "../../Components/Sidebar/Sidebar";
 // import Topbar from "../../Components/Topbar/Topbar";
 
@@ -9,7 +9,13 @@ import { IoBulbOutline } from "react-icons/io5";
 import { CiMicrophoneOn } from "react-icons/ci";
 import { BsSend } from "react-icons/bs";
 import { MdHistory } from "react-icons/md";
+import { trackFeatureUsage } from "../../../utils/FeatureInteraction.js"
+
 const NeuroBot = () => {
+  useEffect(() => {
+    trackFeatureUsage("NeuroBot")
+  }, []);
+
   const [chatHistory,  setChatHistory] = useState([
     { id: 1, title: "Session 1", lastUpdated: "Today, 10:30 AM" },
     { id: 2, title: "Session 2", lastUpdated: "Yesterday, 4:45 PM" },

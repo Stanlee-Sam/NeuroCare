@@ -7,13 +7,14 @@ import SentimentCategories from "../../Components/Charts/PieChart";
 import FeatureInteraction from "../../Components/Charts/RadialChart"; // Fixed typo here
 import Sidebar from "../../Components/Sidebar/Sidebar";
 import Topbar from "../../Components/Topbar/Topbar";
-import { BiSolidUpArrow } from "react-icons/bi";
-import { FaArrowTrendUp } from "react-icons/fa6";
+import { BiSolidDownArrow, BiSolidUpArrow } from "react-icons/bi";
 import { useEffect, useState } from "react";
 import StressProgressBar from "../../Components/ProgressBar/StressProgressBar";
+import { trackFeatureUsage } from "../../../utils/FeatureInteraction.js"
 
 
 import PropTypes from 'prop-types';
+import { FaClipboardList } from "react-icons/fa";
 // import axios from "axios";
 
 function Number({ n }) {
@@ -31,7 +32,16 @@ const Dashboard = () => {
   const [journalEntries, setJournalEntries] = useState([]);
   const [averageStress, setAverageStress] = useState(0);
   // const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
+  const [error, setError] = useState(null);
+  const [currentSentiment, setCurrentSentiment] = useState(0);
+const [sentimentChange, setSentimentChange] = useState(0);
+const [mostFrequentMood, setMostFrequentMood] = useState("N/A");
+const [totalEntries, setTotalEntries] = useState(0);
+
+
+useEffect(() => {
+  trackFeatureUsage("Dashboard");
+}, [])
 
   
   useEffect(() => {
@@ -73,6 +83,56 @@ const Dashboard = () => {
       setAverageStress(calculateAverageStress(todayEntries));
     }, [journalEntries]);
 
+    useEffect(() => {
+      const calculateAverageSentiment = (entries) => {
+        if (entries.length === 0) return 0;
+        const totalSentiment = entries.reduce((sum, entry) => sum + entry.sentimentScore, 0);
+        return (totalSentiment / entries.length).toFixed(2); // Keep two decimal places
+      };
+    
+      const todayEntries = journalEntries.filter((entry) => {
+        return new Date(entry.createdAt).toDateString() === new Date().toDateString();
+      });
+    
+      const yesterdayEntries = journalEntries.filter((entry) => {
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+        return new Date(entry.createdAt).toDateString() === yesterday.toDateString();
+      });
+    
+      const todaySentiment = parseFloat(calculateAverageSentiment(todayEntries));
+      const yesterdaySentiment = parseFloat(calculateAverageSentiment(yesterdayEntries));
+    
+      const sentimentChange = yesterdaySentiment
+        ? ((todaySentiment - yesterdaySentiment) / yesterdaySentiment) * 100
+        : 0; // Avoid division by zero
+    
+      setCurrentSentiment(todaySentiment);
+      setSentimentChange(sentimentChange.toFixed(2)); // Keep two decimal places
+    }, [journalEntries]);
+
+    useEffect(() => {
+      const findMostFrequentMood = (entries) => {
+        if (entries.length === 0) return "N/A";
+    
+        const moodCount = entries.reduce((acc, entry) => {
+          acc[entry.sentiment] = (acc[entry.sentiment] || 0) + 1;
+          return acc;
+        }, {});
+    
+        return Object.keys(moodCount).reduce((a, b) => (moodCount[a] > moodCount[b] ? a : b));
+      };
+    
+      setMostFrequentMood(findMostFrequentMood(journalEntries));
+    }, [journalEntries]);
+
+    useEffect(() => {
+      setTotalEntries(journalEntries.length);
+    }, [journalEntries]);
+    
+    
+    
+
     if (error) return <p>Error : {error}</p>
   
   return (
@@ -84,14 +144,7 @@ const Dashboard = () => {
           <Topbar />
         </div>
         <div className="space-y-4 pl-10 md:pl-14 pb-10 md:pb-5 max-w-full">
-          {/* <div className="welcome">
-            <h1 className="text-center font-bold my-2 text-lg">
-              Welcome back, <span>Stanley</span>
-            </h1>
-            <p className="text-center text-sm">
-              Today is <span>December 25 2025</span>!
-            </p>
-          </div> */}
+          
           <div className="grid gap-2 md:flex max-w-full">
             {/* LEFT */}
             <div className="md:w-4/6 max-w-full flex flex-col gap-4">
@@ -113,14 +166,20 @@ const Dashboard = () => {
                       Current sentiment
                     </h3>
                     <div className="flex justify-evenly items-center">
-                      <span className="font-bold text-[20px]"><Number n={0.8} />
+                      <span className="font-bold text-[20px]">
+                        <Number n={currentSentiment} />
 
                       </span>
                       <span className="relative">
-                        <BiSolidUpArrow className="text-[#207613] animate-bounce" />
-                        <p className="text-[10px] text-[#207613] absolute top-3">
-                          +0.3%
-                        </p>
+                        {sentimentChange >= 0 ? (
+                          <BiSolidUpArrow className="text-[#207613] animate-bounce" />
+                          
+                        ) : (
+                          <BiSolidDownArrow  className="text-[#B22222] animate-bounce" />
+                        )}
+                        <p className="text-[10px]  absolute top-3" style = {{color : sentimentChange >= 0 ? "#207613" : "#B22222"}}>
+                          {sentimentChange >= 0 ? `+${sentimentChange}%` : `${sentimentChange}%`}
+                          </p>
                       </span>
                     </div>
                   </div>
@@ -129,9 +188,11 @@ const Dashboard = () => {
                       Most Frequent Mood
                     </h3>
                     <div className="flex justify-evenly items-center">
-                      <span className="text-[15px] font-bold">Happy</span>
+                      <span className="text-[15px] font-bold">{mostFrequentMood}</span>
                       <span className="">
-                        <p className="text-[20px] text-[#207613] ">🙂</p>
+                        {mostFrequentMood === "Positive" &&<p className="text-[20px] text-[#207613] ">🙂</p>}
+                        {mostFrequentMood === "Neutral" && <p className="text-[20px] text-[#A76A1B] ">😐</p>}
+      {mostFrequentMood === "Negative" && <p className="text-[20px] text-[#B20E0E] ">😞</p>}
                       </span>
                     </div>
                   </div>
@@ -139,17 +200,15 @@ const Dashboard = () => {
                     <div className="flex justify-evenly items-center">
                       <div>
                         <span className="font-bold">
-                          <Number n={289} />
+                          <Number n={totalEntries} />
                         </span>
                       </div>
                       <div>
-                        <FaArrowTrendUp className="animate-pulse" />
+                        <FaClipboardList className="animate-pulse" />
                       </div>
                     </div>
                     <p className="text-sm text-center">Total entries</p>
-                    <span className="text-sm text-center">
-                      -2% than last month
-                    </span>
+                    
                   </div>
                   <div className="flex flex-col bg-white rounded-lg p-4 transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-130 hover:shadow-2xl ">
                     <h3 className="text-[15px] font-light text-center">

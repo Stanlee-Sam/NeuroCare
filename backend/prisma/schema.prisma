@@ -45,3 +45,11 @@ model JournalEntry {
   userId         Int
   user           User     @relation(fields: [userId], references: [id])
 }
+
+model FeatureUsage {
+  id        String   @id @default(uuid())  
+  feature   String   @unique
+  count     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
