@@ -1,44 +1,51 @@
+import { useEffect, useState } from "react";
+import axios from "axios";
 
 
-const activities = [
-    {
-        id : 1,
-        mood : "Happy",
-        emoji : "🙂",
-        date : "12/12/2024",
-        time : "12:00 PM",
-        entry : "Had an amazing day",
-    },
-    {
-        id : 2,
-        mood : "Stressed",
-        emoji : "😟",
-        date : "13/12/2024",
-        time : "13:00 PM",
-        entry : "Overwhelmed with deadlines",
-    }
-]
 const Activity = () => {
+
+    const [activities, setActivities] = useState([]);
+
+    useEffect(()=> {
+        const fetchActivities = async () => {
+            try {
+                const response = await axios.get("http://localhost:5000/api/journal")
+                setActivities(response.data);
+
+            }catch(error){
+                console.error("Error fetching activities:", error);
+            }
+        }
+        fetchActivities();
+    },[])
+    
   return (
-    <div className='flex flex-col gap-4 '>
+    <div className='flex flex-col gap-4 max-h-[400px] md:max-h-[700px] '>
         <div>
             <h1 className='text-center font-bold pt-2'>Recent Activity</h1>
         </div>
-      {activities.map(activity => (
-        <div key={activity.id} className='bg-gray-300 p-4 rounded-lg flex flex-col gap-2 transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-100 hover:shadow-xl'>
+        <div className="overflow-y-auto flex flex-col gap-4 scrollable-container rounded-lg">
+        {activities.map(activity => (
+        <div key={activity.id} className= ' bg-gray-300 p-4 rounded-lg flex flex-col gap-2 transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-100 hover:shadow-xl'>
             <div className='flex justify-between items-center'>
                 <div className='flex justify-between gap-1'>
-                    <h1 className='font-bold lg:text-[17px] text-[10px]'>{activity.mood}</h1>
-                    <p className="text-[12px] lg:text-[19px]">({activity.emoji})</p>
+                    <h1 className='font-bold lg:text-[17px] text-[10px]'>{activity.sentiment}</h1>
+                    <p className="text-[12px] lg:text-[19px]">
+                    {activity.sentiment === "Positive"
+                    ? "🙂"
+                    : activity.sentiment === "Neutral"
+                    ? "😐"
+                    : "😔"}
+                    </p>
                 </div>
                 <div className='flex justify-evenly gap-1'>
-                    <h1 className='font-bold lg:text-[15px] text-[9px]'>{activity.date}</h1>
-                    <h1 className='font-bold lg:text-[15px] text-[9px]'>{activity.time}</h1>
+                    <h1 className='font-bold lg:text-[15px] text-[9px]'>{new Date(activity.createdAt).toLocaleDateString()}</h1>
+                    <h1 className='font-bold lg:text-[15px] text-[9px]'>{new Date(activity.createdAt).toLocaleTimeString()}</h1>
                 </div>
 
             </div>
             <div>
-                <p className='lg:text-[15px] text-[9px]'>&quot;{activity.entry}&quot;</p>
+                <p className='lg:text-[15px] text-[9px]'>&quot;{activity.text}&quot;</p>
             </div>
             <div className='flex justify-between'>
                 <button className='rounded-lg bg-[#608BC1] md:p-2 md:text-[15px] text-[12px] font-bold w-[90px] hover:bg-[#77DD77] hover:text-white'>Edit</button>
@@ -46,6 +53,9 @@ const Activity = () => {
             </div>
         </div>
       ))}
+        </div>
+
+     
     </div>
   )
 }

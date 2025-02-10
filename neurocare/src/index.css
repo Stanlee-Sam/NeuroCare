@@ -80,3 +80,49 @@
   height: 40px;
   animation: spin 1s linear infinite;
 }
+/* Smooth scrolling */
+.scrollable-container {
+  scroll-behavior: smooth;
+  max-height: 700px; /* Adjust height as needed */
+  overflow-y: auto; /* Make it scrollable */
+  padding-right: 10px; /* Prevent overlapping with scrollbar */
+}
+
+/* Scrollbar styling */
+.scrollable-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.scrollable-container::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2); /* Subtle scrollbar */
+  border-radius: 10px;
+}
+
+.scrollable-container::-webkit-scrollbar-track {
+  background: #f1f1f1; /* Lighter background for track */
+}
+
+/* Card hover effect */
+.activity-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.activity-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Padding and margin */
+.activity-card {
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+h1, p {
+  color: #333;
+}
+
+/* Optional: Add rounded corners for a softer look */
+.activity-card {
+  border-radius: 12px;
+}
