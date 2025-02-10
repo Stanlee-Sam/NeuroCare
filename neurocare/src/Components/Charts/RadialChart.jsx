@@ -1,3 +1,5 @@
+
+
 "use client";
 import { useEffect, useState } from "react";
 import axios from "axios";
@@ -7,6 +9,7 @@ import { FaRobot } from "react-icons/fa";
 import { SlOptions } from "react-icons/sl";
 import { FaCalendarAlt } from "react-icons/fa";
 import { RadialBarChart, RadialBar, ResponsiveContainer } from "recharts";
+import { GoGear } from "react-icons/go";
 
 const FeatureInteraction = () => {
   const [data, setData] = useState([]);
@@ -67,6 +70,7 @@ const FeatureInteraction = () => {
         </RadialBarChart>
       </ResponsiveContainer>
 
+      <GoGear className="absolute animate-spin top-[43%] left-[47.6%] md:top-[42%] md:left-[47%]"/>
 
       <div className="grid grid-cols-2 gap-1">
         {data.map((item, index) => (
