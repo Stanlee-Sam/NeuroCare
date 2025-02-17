@@ -1,5 +1,3 @@
-
-
 "use client";
 import { useEffect, useState } from "react";
 import axios from "axios";
@@ -17,7 +15,9 @@ const FeatureInteraction = () => {
   // Function to fetch feature usage data
   const fetchFeatureUsage = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/feature-usage"); // Backend API
+      const response = await axios.get(
+        "http://localhost:5000/api/feature-usage"
+      ); // Backend API
       const featureData = response.data.map((item) => ({
         name: item.feature,
         count: item.count,
@@ -33,7 +33,9 @@ const FeatureInteraction = () => {
   // Function to track feature usage
   const trackFeatureUsage = async (featureName) => {
     try {
-      await axios.post("http://localhost:5000/api/track-feature", { feature: featureName });
+      await axios.post("http://localhost:5000/api/track-feature", {
+        feature: featureName,
+      });
       fetchFeatureUsage(); // Refresh chart
     } catch (error) {
       console.error("Error tracking feature usage:", error);
@@ -47,10 +49,10 @@ const FeatureInteraction = () => {
   // Function to get colors for each feature
   const getColorForFeature = (feature) => {
     const colors = {
-      "Mood Tracking": "#8884d8",  
-      "Calendar": "#FF5733",       
-      "NeuroBot": "#00FFFF",       
-      "Dashboard": "#581845",      
+      "Mood Tracking": "#8884d8",
+      Calendar: "#FF5733",
+      NeuroBot: "#00FFFF",
+      Dashboard: "#581845",
     };
     return colors[feature] || "#888"; // Default color
   };
@@ -65,17 +67,31 @@ const FeatureInteraction = () => {
       </div>
 
       <ResponsiveContainer width="100%" height={300}>
-        <RadialBarChart cx="50%" cy="50%" innerRadius="30%" outerRadius="100%" barSize={40} data={data}>
+        <RadialBarChart
+          cx="50%"
+          cy="50%"
+          innerRadius="30%"
+          outerRadius="100%"
+          barSize={40}
+          data={data}
+        >
           <RadialBar minAngle={15} background dataKey="count" />
         </RadialBarChart>
       </ResponsiveContainer>
 
-      <GoGear className="absolute animate-spin top-[43%] left-[47.6%] md:top-[42%] md:left-[47%]"/>
+      <GoGear className="absolute animate-spin top-[43%] left-[47.6%] md:top-[42%] md:left-[47%]" />
 
       <div className="grid grid-cols-2 gap-1">
         {data.map((item, index) => (
-          <div key={index} className="flex items-center gap-1 cursor-pointer" onClick={() => trackFeatureUsage(item.name)}>
-            <div className="w-2 h-2 rounded-lg" style={{ backgroundColor: item.fill }}></div>
+          <div
+            key={index}
+            className="flex items-center gap-1 cursor-pointer"
+            onClick={() => trackFeatureUsage(item.name)}
+          >
+            <div
+              className="w-2 h-2 rounded-lg"
+              style={{ backgroundColor: item.fill }}
+            ></div>
             <h3 className="text-[10px] font-semibold flex items-center gap-1">
               {item.name === "Mood Tracking" && <IoJournal />}
               {item.name === "Calendar" && <FaCalendarAlt />}
