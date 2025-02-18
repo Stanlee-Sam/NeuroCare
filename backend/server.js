@@ -5,6 +5,7 @@ const dotenv = require("dotenv");
 const sentimentRoutes = require('./routes/sentiment.routes.js')
 const featureRoutes = require('./routes/feature.routes.js')
 const journalRoutes = require('./routes/journal.routes.js')
+const chatRoutes = require('./routes/chat.routes.js')
 const bodyParser = require('body-parser');
 const errorHandler = require("./middleware/feature.middleware.js")
 
@@ -24,6 +25,7 @@ app.get("/", (req, res) => {
 app.use('/api', sentimentRoutes);
 app.use('/api/journal', journalRoutes);
 app.use('/api', featureRoutes)
+app.use('/api', chatRoutes)
 
 
 const PORT = process.env.PORT || 5000;

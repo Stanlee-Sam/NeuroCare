@@ -10,6 +10,12 @@ import { trackFeatureUsage } from "../../../utils/FeatureInteraction.js";
 import { CiCirclePlus } from "react-icons/ci";
 import { IoBulbOutline } from "react-icons/io5";
 
+
+
+
+
+
+
 const NeuroBot = () => {
   useEffect(() => {
     trackFeatureUsage("NeuroBot");
@@ -41,10 +47,11 @@ const NeuroBot = () => {
     setCurrentChat(selectedChat);
   };
 
-  const handleFormSubmit = (e) => {
+  const handleFormSubmit = async (e) => {
     e.preventDefault();
     const userMessage = inputRef.current.value.trim();
     if (!userMessage) return;
+
     inputRef.current.value = "";
 
     if (!hasStartedChat) {
@@ -54,7 +61,6 @@ const NeuroBot = () => {
     const newMessages = [
       ...currentChat.messages,
       { role: "user", text: userMessage },
-      { role: "bot", text: "I'm here to help! 😊" },
     ];
 
     setChats((prevChats) =>
@@ -64,7 +70,91 @@ const NeuroBot = () => {
     );
 
     setCurrentChat((prevChat) => ({ ...prevChat, messages: newMessages }));
+
+    try {
+      const botResponse = await  getBotResponse(userMessage)
+
+      const updatedMessages = [
+        ...newMessages,
+        { role: "bot", text: botResponse },
+      ];
+
+      setChats((prevChats) =>
+        prevChats.map((chat) =>
+          chat.id === currentChat.id? {...chat, messages: updatedMessages } : chat
+        )
+      );
+      setCurrentChat((prevChat) => ({...prevChat, messages: updatedMessages }));
+
+    }catch(error){
+      console.error("Error calling Gemini API :", error);
+
+      const errorMessages = [
+        ...newMessages,
+        { role: "bot", text: "Sorry, something went wrong. Please try again later." },
+      ];
+      setChats((prevChats) =>
+        prevChats.map((chat) =>
+          chat.id === currentChat.id ? { ...chat, messages: errorMessages } : chat
+        )
+      );
+      setCurrentChat((prevChat) => ({ ...prevChat, messages: errorMessages }));
+    }
+
+  }
+  const addPunctuation = (text) => {
+    // Replace markdown-style bullet points (asterisks) with HTML <ul><li> for bullet points
+    const bulletPointText = text.replace(/\* (.*?)(?=\n|\r|$)/g, (match, p1) => {
+      return `<ul><li>${p1}</li></ul>`; // Wrap each bullet point with <ul><li>
+    });
+  
+    // Regular expression to match sentence-ending punctuation
+    const sentenceEndings = /[.!?]/;
+  
+    // Split the cleaned text by common sentence delimiters
+    let sentences = bulletPointText.split(/([.!?])/).filter(Boolean);
+  
+    // Make sure sentences end with punctuation (add a period if none exists)
+    sentences = sentences.map((sentence, index) => {
+      const trimmedSentence = sentence.trim();
+      // Add punctuation if not present
+      if (index % 2 === 0) {
+        // If it's the last sentence, ensure it ends with punctuation
+        return sentenceEndings.test(trimmedSentence) ? trimmedSentence : trimmedSentence + '.';
+      }
+      return sentence; // Keep punctuation marks (., ?, !)
+    });
+  
+    // Join the sentences back together with a space between each
+    return sentences.join('').trim();
   };
+  
+
+  const getBotResponse = async (userMessage) => {
+    try {
+        const response = await fetch('http://localhost:5000/api/chat', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ userMessage })
+        });
+
+        
+        if (!response.ok) {
+            throw new Error('Failed to get response from the server');
+        }
+
+        const data = await response.json(); 
+        console.log("Bot Response:", data); 
+
+        return addPunctuation(data.reply); 
+      } catch (error) {
+        console.error("Error:", error); 
+        return "Sorry, something went wrong. Please try again.";
+    }
+};
+
 
   return (
     <div className="flex max-h-screen bg-[#D9D9D9] overflow-x-hidden">
@@ -129,15 +219,11 @@ const NeuroBot = () => {
               <div className="flex flex-col space-y-3 pb-16 md:pb-20">
                 {currentChat.messages.map((message, index) => (
                   <div
-                    key={index}
-                    className={`p-3 rounded-lg  ${
-                      message.role === "user"
-                        ? "bg-[#608BC1] text-white self-end max-w-[80%] text-[18px]"
-                        : " text-black w-full text-[18px] "
-                    }`}
-                  >
-                    {message.text}
-                  </div>
+  key={index}
+  className={`p-3 rounded-lg ${message.role === "user" ? "bg-[#608BC1] text-white self-end max-w-[80%] text-[18px]" : "text-black w-full text-[18px]"}`}
+  dangerouslySetInnerHTML={{ __html: message.text }} // This will allow HTML to be rendered
+/>
+
                 ))}
                 <div ref={messagesEndRef} />
               </div>
