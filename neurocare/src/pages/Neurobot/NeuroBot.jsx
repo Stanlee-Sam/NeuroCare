@@ -103,30 +103,43 @@ const NeuroBot = () => {
 
   }
   const addPunctuation = (text) => {
-    // Replace markdown-style bullet points (asterisks) with HTML <ul><li> for bullet points
-    const bulletPointText = text.replace(/\* (.*?)(?=\n|\r|$)/g, (match, p1) => {
-      return `<ul><li>${p1}</li></ul>`; // Wrap each bullet point with <ul><li>
-    });
+    // Remove markdown bold formatting if present
+    text = text.replace(/\*\*(.*?)\*\*/g, "$1");
   
-    // Regular expression to match sentence-ending punctuation
-    const sentenceEndings = /[.!?]/;
+    // Replace bullet asterisks at the start of lines with a dash and a space.
+    text = text.replace(/^\*\s+/gm, "- ");
   
-    // Split the cleaned text by common sentence delimiters
-    let sentences = bulletPointText.split(/([.!?])/).filter(Boolean);
+    // If stray asterisks appear inline that you don't need, you can remove them:
+    // text = text.replace(/\*/g, "");
   
-    // Make sure sentences end with punctuation (add a period if none exists)
-    sentences = sentences.map((sentence, index) => {
-      const trimmedSentence = sentence.trim();
-      // Add punctuation if not present
-      if (index % 2 === 0) {
-        // If it's the last sentence, ensure it ends with punctuation
-        return sentenceEndings.test(trimmedSentence) ? trimmedSentence : trimmedSentence + '.';
-      }
-      return sentence; // Keep punctuation marks (., ?, !)
-    });
+    // Collapse multiple punctuation marks into one
+    text = text.replace(/([.!?])(?:\s*[.!?])+/g, "$1");
   
-    // Join the sentences back together with a space between each
-    return sentences.join('').trim();
+    // Ensure there's a space after punctuation if it’s not there already
+    text = text.replace(/([.!?])(?=[^\s])/g, "$1 ");
+  
+    // Insert an HTML line break (<br>) before a bullet if not already on a new line.
+    text = text.replace(/([^\n])\s*-\s+/g, "$1<br>- ");
+  
+    // Remove any extra spaces and trim the text
+    text = text.replace(/\s{2,}/g, " ").trim();
+  
+    return text;
+  };
+  
+  
+
+  const clientCleanText = (text) => {
+    // Collapse duplicate punctuation marks (e.g., ".." or "!!!")
+    text = text.replace(/([.!?])([.!?]+)/g, "$1");
+  
+    // Ensure a space after punctuation if it’s immediately followed by a letter or number.
+    text = text.replace(/([.!?])(?=[A-Za-z0-9])/g, "$1 ");
+  
+    // Remove extra spaces
+    text = text.replace(/\s{2,}/g, " ").trim();
+  
+    return text;
   };
   
 
@@ -148,7 +161,9 @@ const NeuroBot = () => {
         const data = await response.json(); 
         console.log("Bot Response:", data); 
 
-        return addPunctuation(data.reply); 
+        const cleanedResponse = clientCleanText(addPunctuation(data.reply));
+
+        return cleanedResponse; 
       } catch (error) {
         console.error("Error:", error); 
         return "Sorry, something went wrong. Please try again.";
