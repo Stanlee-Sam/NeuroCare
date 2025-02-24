@@ -191,33 +191,98 @@ const StressLevels = () => {
   }, [timeSpan]);
   
 
+  // const aggregateData = (data, timeSpan) => {
+  //   let groupedData = {};
+  
+  //   data.forEach((entry) => {
+  //     let key = "Unknown";
+  
+  //     if (timeSpan === "daily") {
+  //       key = entry.name;
+  //     } else if (timeSpan === "weekly") {
+  //       let date = new Date(entry.createdAt);
+  //       if (!isNaN(date.getTime())) {
+  //         key = date.toLocaleDateString("en-US", { weekday: "short" });
+  //       }
+  //     } else if (timeSpan === "monthly") {
+  //       let date = new Date(entry.createdAt);
+  //       if (!isNaN(date.getTime())) {
+  //         key = `Week ${Math.ceil(date.getDate() / 7)}`;
+  //       }
+  //     }
+  
+  //     if (!groupedData[key]) {
+  //       groupedData[key] = { total: 0, count: 0 };
+  //     }
+  
+      
+  //     if (typeof entry.Level === "number" && !isNaN(entry.Level)) {
+  //       let normalizedLevel = Math.min(entry.Level, 100); // Cap at 100
+  //       groupedData[key].total += normalizedLevel;
+  //       groupedData[key].count += 1;
+  //     }
+  //   });
+  
+  //   return Object.keys(groupedData).map((key) => {
+  //     const avgStress = groupedData[key].count > 0 ? groupedData[key].total / groupedData[key].count : 0;
+  //     return {
+  //       name: key,
+  //       Level: Math.round(avgStress), 
+  //     };
+  //   });
+  // };
+  
+  
+  
   const aggregateData = (data, timeSpan) => {
     let groupedData = {};
   
+    // Get the current date in the desired timezone
+    const now = new Date();
+    const localNow = new Date(now.toLocaleString("en-US", { timeZone: "Africa/Nairobi" }));
+    const currentDateString = localNow.toLocaleDateString("en-US", { timeZone: "Africa/Nairobi" });
+    const currentMonth = localNow.getMonth();
+    const currentYear = localNow.getFullYear();
+    // Define the current week as the week number within the month
+    const currentWeek = Math.ceil(localNow.getDate() / 7);
+  
     data.forEach((entry) => {
+      const entryDate = new Date(entry.createdAt);
+      const localEntry = new Date(entryDate.toLocaleString("en-US", { timeZone: "Africa/Nairobi" }));
+      
       let key = "Unknown";
   
       if (timeSpan === "daily") {
-        key = entry.name;
+        // Only include entries from today.
+        const entryDateString = localEntry.toLocaleDateString("en-US", { timeZone: "Africa/Nairobi" });
+        if (entryDateString !== currentDateString) return;
+        // Group by the entry name 
+        key = entry.name; 
       } else if (timeSpan === "weekly") {
-        let date = new Date(entry.createdAt);
-        if (!isNaN(date.getTime())) {
-          key = date.toLocaleDateString("en-US", { weekday: "short" });
+        // Only include entries that belong to the current week.
+        const entryWeek = Math.ceil(localEntry.getDate() / 7);
+        if (localEntry.getMonth() !== currentMonth ||
+            localEntry.getFullYear() !== currentYear ||
+            entryWeek !== currentWeek) {
+          return;
         }
+        // Group by weekday 
+        key = localEntry.toLocaleDateString("en-US", { weekday: "short" });
       } else if (timeSpan === "monthly") {
-        let date = new Date(entry.createdAt);
-        if (!isNaN(date.getTime())) {
-          key = `Week ${Math.ceil(date.getDate() / 7)}`;
+        // Only include entries from the current month
+        if (localEntry.getMonth() !== currentMonth || localEntry.getFullYear() !== currentYear) {
+          return;
         }
+        // Group by week of the month
+        key = `Week ${Math.ceil(localEntry.getDate() / 7)}`;
       }
   
+      // Group and accumulate values
       if (!groupedData[key]) {
         groupedData[key] = { total: 0, count: 0 };
       }
-  
-      
       if (typeof entry.Level === "number" && !isNaN(entry.Level)) {
-        let normalizedLevel = Math.min(entry.Level, 100); // Cap at 100
+        const normalizedLevel = Math.min(entry.Level, 100); 
         groupedData[key].total += normalizedLevel;
         groupedData[key].count += 1;
       }
@@ -225,12 +290,18 @@ const StressLevels = () => {
   
     return Object.keys(groupedData).map((key) => {
       const avgStress = groupedData[key].count > 0 ? groupedData[key].total / groupedData[key].count : 0;
-      return {
-        name: key,
-        Level: Math.round(avgStress), 
-      };
+      return { name: key, Level: Math.round(avgStress) };
     });
   };
+  
+  // const shouldIncludeData = (timestamp) => {
+  //   // Allowed hours for filtering, e.g., "10", "2", "4"
+  //   const allowedHours = ["10", "2", "4"];
+  //   const hour = timestamp.split(":")[0]; // Extract hour from something like "10:10 AM"
+  //   console.log("Checking if hour should be included: ", hour);
+  //   return allowedHours.includes(hour);
+  // };
+  
   
   
   

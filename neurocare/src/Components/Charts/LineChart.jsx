@@ -26,54 +26,139 @@ const SentimentChart = ({ journalEntries = [] }) => {
     setTimeSpan("daily"); 
   }, [journalEntries]);
 
+  // const formatData = (entries, period) => {
+  //   console.log("Entries received in formatData:", entries);
+  //   const groupedData = {};
+
+  //   const today = new Date().toLocaleDateString("en-US", { timeZone: "Africa/Nairobi" });
+    
+
+  //   entries.forEach((entry) => {
+  //     console.log("Processing entry:", entry);
+  //     const date = new Date(entry.createdAt);
+
+  //     const localDate = new Date(date.toLocaleString("en-US", { timeZone: "Africa/Nairobi" }));
+
+  //     const entryDate = localDate.toLocaleDateString("en-US", { timeZone: "Africa/Nairobi" });
+
+  //     let key;
+  //     if (period === "daily") {
+
+  //       if(entryDate !== today) return;
+
+  //       key = `${localDate.getHours()}:00`; 
+  //     } else if (period === "weekly") {
+  //       const weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+  //       key = weekdays[localDate.getDay()]; 
+  //     } else if (period === "monthly") {
+  //       key = `Week ${Math.ceil(localDate.getDate() / 7)}`; 
+  //     }
+
+  //     console.log("Grouping Entry:", entry.id, "| Date:", localDate, "| Key:", key);
+
+  //     if (!groupedData[key]) {
+  //       groupedData[key] = { name: key, sentiment: 0, count: 0 };
+  //     }
+  //     groupedData[key].sentiment += entry.sentimentScore;
+  //     groupedData[key].count += 1;
+  //   });
+
+  //   const formattedData = Object.values(groupedData).map((item) => ({
+  //     name: item.name,
+  //     sentiment: item.count > 0 ? Number((item.sentiment / item.count).toFixed(2)) : 0,
+  //   }))
+  //   .sort((a, b) => a.name.localeCompare(b.name)); 
+
+  //   console.log("Formatted Data:", formattedData);
+  //   return formattedData;
+  // };
+
   const formatData = (entries, period) => {
     console.log("Entries received in formatData:", entries);
     const groupedData = {};
-
+  
+    // Get the current date in the user's timezone
+    const now = new Date();
+    const today = new Date().toLocaleDateString("en-US", { timeZone: "Africa/Nairobi" });
+  
+    // Get current week & month info
+    const currentWeek = Math.ceil(now.getDate() / 7); // Week of the month 
+    const currentMonth = now.getMonth(); // 0 = Jan, 1 = Feb, etc.
+    const currentYear = now.getFullYear();
+  
     entries.forEach((entry) => {
       console.log("Processing entry:", entry);
       const date = new Date(entry.createdAt);
-
+  
+      // Convert to user's timezone
       const localDate = new Date(date.toLocaleString("en-US", { timeZone: "Africa/Nairobi" }));
-
+  
+      // Get date info for comparison
+      const entryDate = localDate.toLocaleDateString("en-US", { timeZone: "Africa/Nairobi" });
+      const entryWeek = Math.ceil(localDate.getDate() / 7);
+      const entryMonth = localDate.getMonth();
+      const entryYear = localDate.getFullYear();
+  
       let key;
       if (period === "daily") {
-        key = `${localDate.getHours()}:00`; 
+        if (entryDate !== today) return; // Only show today's entries
+        key = `${localDate.getHours()}:00`; // Hourly format
       } else if (period === "weekly") {
+        if (entryWeek !== currentWeek || entryMonth !== currentMonth || entryYear !== currentYear) return; // Show only this week's data
         const weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-        key = weekdays[localDate.getDay()]; 
+        key = weekdays[localDate.getDay()]; // Group by weekday
       } else if (period === "monthly") {
-        key = `Week ${Math.ceil(localDate.getDate() / 7)}`; 
+        if (entryMonth !== currentMonth || entryYear !== currentYear) return; // Show only this month's data
+        key = `Week ${entryWeek}`; // Group by weeks within the current month
       }
-
+  
       console.log("Grouping Entry:", entry.id, "| Date:", localDate, "| Key:", key);
-
+  
       if (!groupedData[key]) {
         groupedData[key] = { name: key, sentiment: 0, count: 0 };
       }
       groupedData[key].sentiment += entry.sentimentScore;
       groupedData[key].count += 1;
     });
-
-    const formattedData = Object.values(groupedData).map((item) => ({
+  
+    let formattedData = Object.values(groupedData).map((item) => ({
       name: item.name,
       sentiment: item.count > 0 ? Number((item.sentiment / item.count).toFixed(2)) : 0,
-    }))
-    .sort((a, b) => a.name.localeCompare(b.name)); 
-
+    }));
+  
+    //  Apply proper sorting logic based on period
+    if (period === "weekly") {
+      const weekdaysOrder = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+      formattedData.sort((a, b) => weekdaysOrder.indexOf(a.name) - weekdaysOrder.indexOf(b.name));
+    } else if (period === "monthly") {
+      formattedData.sort((a, b) => {
+        const weekNumberA = parseInt(a.name.replace(/\D/g, ""), 10); 
+        const weekNumberB = parseInt(b.name.replace(/\D/g, ""), 10);
+        return weekNumberA - weekNumberB;
+      });
+    }
+    console.log("Sorted Weekly Data:", formattedData);
+    console.log("Sorted Monthly Data:", formattedData);
+    
     console.log("Formatted Data:", formattedData);
     return formattedData;
   };
+  
 
   const chartData = useMemo(() => {
     console.log("Processing journalEntries:", journalEntries);
     if (journalEntries.length > 0) {
-      // Ensure data is sorted by createdAt (ascending)
       const sortedEntries = [...journalEntries].sort(
         (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
       );
   
-      return formatData(sortedEntries, timeSpan);
+      const formatted = formatData(sortedEntries, timeSpan);
+
+      if (timeSpan === "daily") {
+        return formatted.reverse();
+      }
+
+      return formatted
     }
   
     return [{ name: "No Data" }];
