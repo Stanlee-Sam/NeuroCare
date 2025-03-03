@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 const About = () => {
   return (
     <section className="pt-10 pb-20">
@@ -20,7 +21,10 @@ const About = () => {
             your emotions, understand your mood patterns, and support your
             journey with personalized AI guidance
           </p>
-          <button className="bg-[#77DD77] text-black-600 p-3 rounded-lg text-[10px] md:text-[15px] font-bold hover:bg-gray-100 transition text-md self-center w-[200px] ">Get Started</button>
+          <button className="bg-[#77DD77] text-black-600 p-3 rounded-lg text-[10px] md:text-[15px] font-bold hover:bg-gray-100 transition text-md self-center w-[200px] ">
+          <Link to="/login">Get Started</Link>
+
+            </button>
           </div>
       </div>
     </section>

@@ -3,6 +3,7 @@ import { FaFacebookF } from "react-icons/fa6";
 import { IoMail } from "react-icons/io5";
 import { IoIosLock } from "react-icons/io";
 import { MdAccountCircle } from "react-icons/md";
+import { Link } from "react-router-dom";
 const SignUp = () => {
   return (
     <section className=" grid place-items-center bg-[#D9D9D9] md:h-screen  ">
@@ -18,7 +19,8 @@ const SignUp = () => {
               To keep connected with us please login with your personal info{" "}
             </p>
             <button className="max-[770px]:mb-5 border-2 border-white inline-block text-white hover:bg-white rounded-full px-12 py-2 font-semibold mt-5 hover:text-[#77DD77] w-full">
-              Sign In
+              <Link to = "/login">              Sign In
+              </Link>
             </button>
           </div>
         </div>
@@ -90,7 +92,7 @@ const SignUp = () => {
                 type="submit"
                 className=" border-2 border-[#77DD77] inline-block text-black hover:bg-[#77DD77] rounded-full px-12 py-2 font-semibold mb-2 hover:text-white w-full"
               >
-                Login
+                Sign up
               </button>
               <div className="text-center text-sm text-gray-600" />
             </div>

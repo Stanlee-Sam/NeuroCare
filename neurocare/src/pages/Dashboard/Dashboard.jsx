@@ -11,7 +11,7 @@ import { BiSolidDownArrow, BiSolidUpArrow } from "react-icons/bi";
 import { useEffect, useState } from "react";
 import StressProgressBar from "../../Components/ProgressBar/StressProgressBar";
 import { trackFeatureUsage } from "../../../utils/FeatureInteraction.js"
-
+import {Link} from "react-router-dom";
 
 import PropTypes from 'prop-types';
 import { FaClipboardList } from "react-icons/fa";
@@ -157,7 +157,8 @@ useEffect(() => {
                     What&apos;s your mood today?
                   </p>
                   <button className="text-black font-semibold rounded-md text-sm p-2 bg-[#77DD77] hover:bg-[#77DD77] hover:text-white ">
-                    Log Mood
+                    <Link to="/journal">                    Log Mood
+                    </Link>
                   </button>
                 </div>
                 <div className="md:w-[45%] w-full flex flex-col gap-2 md:grid md:grid-cols-2 ">

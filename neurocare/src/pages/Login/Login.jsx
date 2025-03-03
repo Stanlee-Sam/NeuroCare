@@ -2,7 +2,7 @@ import { FaGoogle } from "react-icons/fa";
 import { FaFacebookF } from "react-icons/fa6";
 import { IoMail } from "react-icons/io5";
 import { IoIosLock } from "react-icons/io";
-
+import { Link } from "react-router-dom";
 const Login = () => {
   return (
     <section className="grid place-items-center bg-[#D9D9D9] h-screen">
@@ -97,7 +97,8 @@ const Login = () => {
               Enter your personal details and start your journey with us
             </p>
             <button className="border-2 border-white inline-block text-white hover:bg-white rounded-full px-12 py-2 font-semibold mt-3 md:mt-5 hover:text-[#608BC1] w-full">
-              Sign Up
+              <Link to = "/signup">              Sign Up
+              </Link>
             </button>
           </div>
         </div>
