@@ -1,4 +1,4 @@
-const { getJournalEntries, saveJournalEntry, getAllJournalEntries, getRecentJournalEntries } = require('../services/journal.service');
+const { getJournalEntries, saveJournalEntry, getAllJournalEntries, getRecentJournalEntries,deleteJournalEntry } = require('../services/journal.service');
 
 exports.getJournalEntries = async (req, res, next) => {
   try {
@@ -48,4 +48,19 @@ exports.saveJournalEntry = async (req, res, next) => {
 };
 
   
-  
+
+exports.deleteJournalEntry = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+
+    if (!id) {
+      return res.status(400).json({ error: "Entry ID is required." });
+    }
+
+    const deletedEntry = await deleteJournalEntry(id);
+    res.json({ message: "Journal entry deleted successfully.", deletedEntry });
+  } catch (err) {
+    next(err);
+  }
+};
+

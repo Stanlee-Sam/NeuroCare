@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 
 const Activity = () => {
@@ -18,6 +19,19 @@ const Activity = () => {
         }
         fetchActivities();
     },[])
+
+    const handleDelete = async (id) => {
+        try{
+            await axios.delete(`http://localhost:5000/api/journal/delete/${id}`);
+            setActivities(activities.filter(activity => activity.id !== id));
+            toast.success("Activity deleted successfully")
+
+        } catch(error){
+            console.error("Error deleting activity:", error);
+            toast.error("Error deleting activity")
+        }
+
+    }
     
   return (
     <div className='flex flex-col gap-4 max-h-[400px] md:max-h-[700px] '>
@@ -47,9 +61,9 @@ const Activity = () => {
             <div>
                 <p className='lg:text-[15px] text-[9px]'>&quot;{activity.text}&quot;</p>
             </div>
-            <div className='flex justify-between'>
-                <button className='rounded-lg bg-[#608BC1] md:p-2 md:text-[15px] text-[12px] font-bold w-[90px] hover:bg-[#77DD77] hover:text-white'>Edit</button>
-                <button className='rounded-lg bg-[#dd0707] md:p-2 md:text-[15px] text-[12px] font-bold w-[90px] hover:bg-[#f70303] hover:text-white'>Delete</button>
+            <div className='gap-2 w-full justify-self-end'>
+                {/* <button className='rounded-lg bg-[#608BC1] md:p-2 md:text-[15px] text-[12px] font-bold w-[90px] hover:bg-[#77DD77] hover:text-white'>Edit</button> */}
+                <button onClick={()=> handleDelete(activity.id)} className='w-[90px] rounded-lg bg-[#dd0707] md:p-2 md:text-[15px] text-[12px] font-bold  hover:bg-[#f70303] hover:text-white'>Delete</button>
             </div>
         </div>
       ))}

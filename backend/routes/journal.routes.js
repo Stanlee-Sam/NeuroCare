@@ -8,5 +8,7 @@ router.post('/create', journalEntryMiddleware.validateJournalEntry, journalEntry
 router.get('/', journalEntryController.getJournalEntries);
 router.get('/chart', journalEntryController.getJournalEntriesForChart); 
 router.get('/history', journalEntryController.getRecentJournalEntriesForHistory); 
+router.delete('/delete/:id', journalEntryController.deleteJournalEntry);
+
 
 module.exports = router;

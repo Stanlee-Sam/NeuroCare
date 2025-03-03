@@ -31,18 +31,6 @@ exports.getRecentJournalEntries = async () => {
   }
 };
 
-// exports.getAllJournalEntries = async () => {
-//   try {
-//     const entries = await prisma.journalEntry.findMany({
-//       orderBy: {
-//         createdAt: 'asc'
-//       }
-//     });
-//     return entries;
-//   } catch (err) {
-//     throw new Error("Error fetching all journal entries: " + err.message);
-//   }
-// };
 
 exports.getAllJournalEntries = async () => {
   try {
@@ -101,14 +89,28 @@ exports.saveJournalEntry = async (text, sentiment, sentimentScore, level, userId
 };
 
 
-// const calculateStressLevel = (sentimentScore) => {
-//   if (sentimentScore <= -0.3){
-//       return Math.floor(Math.random() * (100-70) + 70);
-//   }
-//   if (sentimentScore > -0.3 && sentimentScore < 0.3){
-//       return Math.floor(Math.random() * (69-40) + 40);
-//   }
-//   else {
-//       return Math.floor(Math.random() * (39-0) + 0);
-//   }
-// }
+
+exports.deleteJournalEntry = async (entryId) => {
+  try {
+    const id = parseInt(entryId); 
+
+    
+    const existingEntry = await prisma.journalEntry.findUnique({
+      where: { id },
+    });
+
+    if (!existingEntry) {
+      throw new Error("Journal entry not found.");
+    }
+
+    
+    const deletedEntry = await prisma.journalEntry.delete({
+      where: { id },
+    });
+
+    return deletedEntry;
+  } catch (err) {
+    throw new Error("Error deleting journal entry: " + err.message);
+  }
+};
+
