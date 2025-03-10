@@ -6,16 +6,19 @@ import { FaRobot } from "react-icons/fa";
 import { GrResources } from "react-icons/gr";
 import { IoSettings } from "react-icons/io5";
 import { RiLogoutCircleLine } from "react-icons/ri";
-
+import { useLogout } from "../Firebase/useLogout.js";
+import { useAuth } from "../Firebase/useAuth";
 const Sidebar = () => {
   const [open, setOpen] = useState(false);
+  const logout = useLogout();
+  const { user } = useAuth();
 
   return (
     <div className=" fixed top-0 z-50 left-0 h-screen">
       <div
         className={`${
-          open ? "w-72" : "w-[50px]"
-        } duration-300 h-full  bg-[#77DD77] relative sm:w-[40px] `}
+          open ? "w-60" : "w-[50px]"
+        } duration-300 h-full  bg-[#77DD77] relative  `}
       >
         <img
           className={`${
@@ -96,10 +99,13 @@ const Sidebar = () => {
           </li>
         </ul>
         <div className="flex justify-center items-center absolute bottom-0 w-full h-24 bg-[#77DD77]">
-          <button title="Logout" className=" border-2 border-black text-black hover:bg-white hover:text-[#77DD77] hover:border-white p-2 gap-2 rounded-full flex justify-between items-center font-bold">
+          { user && (
+            <button onClick={logout} title="Logout" className=" border-2 border-black text-black hover:bg-white hover:text-[#77DD77] hover:border-white p-2 gap-2 rounded-full flex justify-between items-center font-bold">
             <RiLogoutCircleLine className="font-bold" />
             {open && <p>Logout</p>}
           </button>
+          )}
+          
         </div>
       </div>
     </div>

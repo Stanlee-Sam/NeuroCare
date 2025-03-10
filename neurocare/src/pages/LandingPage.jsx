@@ -4,7 +4,6 @@ import Features from "./LandingPage/Features/Features"
 import Footer from "./LandingPage/Footer/Footer"
 import Hero from "./LandingPage/Hero/Hero"
 import Join from "./LandingPage/Join/Join"
-
 const LandingPage = () => {
   return (
     <div>

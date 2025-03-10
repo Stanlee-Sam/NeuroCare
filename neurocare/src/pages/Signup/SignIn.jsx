@@ -3,8 +3,50 @@ import { FaFacebookF } from "react-icons/fa6";
 import { IoMail } from "react-icons/io5";
 import { IoIosLock } from "react-icons/io";
 import { MdAccountCircle } from "react-icons/md";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { auth, db } from "../../Components/Firebase/firebase";
+import { setDoc, doc } from "firebase/firestore";
+import { toast } from "react-toastify";
+
 const SignUp = () => {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const navigate =  useNavigate();
+
+  const handleRegister = async (e) => {
+    e.preventDefault();
+    try {
+      await createUserWithEmailAndPassword(auth, email, password);
+      const user = auth.currentUser;
+      console.log(user);
+      if(user){
+        await setDoc(doc(db, "Users", user.uid), {
+          name: name,
+          email: user.email,
+        })
+      }
+
+
+      console.log("User registered successfully!")
+      toast.success("User registered successfully!", {
+        position: "top-center",
+      })
+      navigate("/login")
+      
+    } catch (error) {
+      console.error("Error registering user:", error);
+      toast.error("Failed to register user. Please try again.", {
+        position: "bottom-center",
+      })
+      
+    }
+  }
+
+
+
   return (
     <section className=" grid place-items-center bg-[#D9D9D9] md:h-screen  ">
       <div className=" place-self-center md:flex bg-white  md:w-[50%] w-[100%] ">
@@ -60,13 +102,15 @@ const SignUp = () => {
               </p>
             </div>
 
-            <form className="grid justify-center gap-y-2">
+            <form onSubmit={handleRegister} className="grid justify-center gap-y-2">
               <div className="flex items-center border-2 bg-gray-100 border-gray-200 p-2 rounded-lg ">
                 <MdAccountCircle className="text-2xl text-gray-400 font-light" />
                 <input
                   className="font-medium outline-none rounded-lg p-2 text-sm bg-gray-100 "
                   type="text"
                   placeholder="Name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
                 />
               </div>
               <div className="flex items-center border-2 bg-gray-100 border-gray-200 p-2 rounded-lg ">
@@ -75,6 +119,8 @@ const SignUp = () => {
                   className="font-medium outline-none rounded-lg p-2 text-sm bg-gray-100 "
                   type="text"
                   placeholder="Email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
               <div className="flex items-center border-2 bg-gray-100 border-gray-200 p-2 rounded-lg ">
@@ -83,11 +129,11 @@ const SignUp = () => {
                   className="font-medium outline-none rounded-lg p-2 text-sm bg-gray-100 "
                   type="password"
                   placeholder="Password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                 />
               </div>
-            </form>
-           
-            <div className="place-self-center my-5">
+              <div className="place-self-center my-5">
               <button
                 type="submit"
                 className=" border-2 border-[#77DD77] inline-block text-black hover:bg-[#77DD77] rounded-full px-12 py-2 font-semibold mb-2 hover:text-white w-full"
@@ -96,6 +142,9 @@ const SignUp = () => {
               </button>
               <div className="text-center text-sm text-gray-600" />
             </div>
+            </form>
+           
+            
           </div>
         </div>
       </div>

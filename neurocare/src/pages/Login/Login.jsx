@@ -1,9 +1,40 @@
+import { useState } from "react";
 import { FaGoogle } from "react-icons/fa";
 import { FaFacebookF } from "react-icons/fa6";
 import { IoMail } from "react-icons/io5";
 import { IoIosLock } from "react-icons/io";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../../Components/Firebase/firebase";
+
+import { toast } from "react-toastify";
+
 const Login = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      console.log("User logged in successfully!");
+      toast.success("User logged in successfully!", {
+        position: "top-center"
+      })
+      navigate("/dashboard")
+
+      
+    } catch (error) {
+      console.error("Error logging in:", error);
+      toast.error("Invalid email or password. Please try again.", {
+        position: "bottom-center"
+    });
+      
+    }
+  }
+
+
   return (
     <section className="grid place-items-center bg-[#D9D9D9] h-screen">
       <div className="md:flex bg-white md:w-[50%] w-full grid  h-full md:h-auto lg:h-[75] place-self-center">
@@ -44,13 +75,15 @@ const Login = () => {
               </p>
             </div>
 
-            <form className="grid justify-center gap-y-2">
+            <form onSubmit={handleSubmit} className="grid justify-center gap-y-2">
               <div className="flex items-center border-2 bg-gray-100 border-gray-200 p-2 rounded-lg">
                 <IoMail className="text-2xl text-gray-400 font-light" />
                 <input
                   className="font-medium outline-none rounded-lg p-2 text-sm bg-gray-100"
                   type="text"
                   placeholder="Email"
+                  value = {email}
+                  onChange={(e) => setEmail(e.target.value)}
                 />
               </div>
               <div className="flex items-center border-2 bg-gray-100 border-gray-200 p-2 rounded-lg">
@@ -59,10 +92,11 @@ const Login = () => {
                   className="font-medium outline-none rounded-lg p-2 text-sm bg-gray-100"
                   type="password"
                   placeholder="Password"
+                  value = {password}
+                  onChange={(e) => setPassword(e.target.value)}
                 />
               </div>
-            </form>
-            <div className="flex justify-evenly w-64 md:my-5 my-3">
+              <div className="flex justify-evenly w-64 md:my-5 my-3">
               <label
                 htmlFor="remember"
                 className="text-xs flex items-center gap-1"
@@ -82,6 +116,8 @@ const Login = () => {
               </button>
               <div className="text-center text-sm text-gray-600" />
             </div>
+            </form>
+            
           </div>
         </div>
 
