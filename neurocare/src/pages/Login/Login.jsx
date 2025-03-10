@@ -4,8 +4,10 @@ import { FaFacebookF } from "react-icons/fa6";
 import { IoMail } from "react-icons/io5";
 import { IoIosLock } from "react-icons/io";
 import { Link, useNavigate } from "react-router-dom";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../../Components/Firebase/firebase";
+import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { auth,db } from "../../Components/Firebase/firebase";
+import { setDoc, doc , getDoc} from "firebase/firestore";
+
 
 import { toast } from "react-toastify";
 
@@ -33,6 +35,40 @@ const Login = () => {
       
     }
   }
+  const googleLogIn = async () => {
+    const provider = new GoogleAuthProvider();
+  
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+      const isNewUser = result?.additionalUserInfo?.isNewUser || false;
+
+      console.log("Google user:", user);
+      console.log("Is new user:", isNewUser);
+
+      const userRef = doc(db, "users", user.uid);
+      const userSnap = await getDoc(userRef);
+
+      if (isNewUser || !userSnap.exists()) {
+        await setDoc(userRef, {
+          name: user.displayName,
+          email: user.email,
+          createdAt: new Date(),
+        });
+
+        toast.success("Welcome! Your account has been created.", { position: "top-center" });
+      } else {
+        toast.success("Welcome back! Login successful", { position: "top-center" });
+      }
+
+      navigate("/dashboard");
+
+    } catch (error) {
+      console.error("Error signing in with Google:", error);
+      toast.error("Google sign-in failed", { position: "bottom-center" });
+    }
+        
+      }
 
 
   return (
@@ -59,7 +95,7 @@ const Login = () => {
                 href="#"
                 className="border-2 border-gray-200 mx-1 p-2 rounded-[50%] hover:border-[#608BC1]"
               >
-                <FaGoogle className="w-6 h-6 text-black hover:text-[#608BC1]" />
+                <FaGoogle onClick={googleLogIn} className="w-6 h-6 text-black hover:text-[#608BC1]" />
               </a>
               <a
                 href="#"
