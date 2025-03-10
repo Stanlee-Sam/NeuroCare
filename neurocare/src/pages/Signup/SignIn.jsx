@@ -5,7 +5,12 @@ import { IoIosLock } from "react-icons/io";
 import { MdAccountCircle } from "react-icons/md";
 import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  FacebookAuthProvider,
+  GoogleAuthProvider,
+  signInWithPopup,
+} from "firebase/auth";
 import { auth, db } from "../../Components/Firebase/firebase";
 import { setDoc, doc, getDoc } from "firebase/firestore";
 import { toast } from "react-toastify";
@@ -14,7 +19,7 @@ const SignUp = () => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const navigate =  useNavigate();
+  const navigate = useNavigate();
 
   const handleRegister = async (e) => {
     e.preventDefault();
@@ -22,65 +27,93 @@ const SignUp = () => {
       await createUserWithEmailAndPassword(auth, email, password);
       const user = auth.currentUser;
       console.log(user);
-      if(user){
+      if (user) {
         await setDoc(doc(db, "Users", user.uid), {
           name: name,
           email: user.email,
-        })
+        });
       }
 
-
-      console.log("User registered successfully!")
+      console.log("User registered successfully!");
       toast.success("User registered successfully!", {
         position: "top-center",
-      })
-      navigate("/login")
-      
+      });
+      navigate("/login");
     } catch (error) {
       console.error("Error registering user:", error);
       toast.error("Failed to register user. Please try again.", {
         position: "bottom-center",
-      })
-      
+      });
     }
-  }
-    const googleSignIn = async () => {
-      const provider = new GoogleAuthProvider();
-        
-          try {
-            const result = await signInWithPopup(auth, provider);
-            const user = result.user;
-            const isNewUser = result?.additionalUserInfo?.isNewUser || false;
-      
-            console.log("Google user:", user);
-            console.log("Is new user:", isNewUser);
-      
-            const userRef = doc(db, "users", user.uid);
-            const userSnap = await getDoc(userRef);
-      
-            if (isNewUser || !userSnap.exists()) {
-              await setDoc(userRef, {
-                name: user.displayName,
-                email: user.email,
-                createdAt: new Date(),
-              });
-      
-              toast.success("Welcome! Your account has been created.", { position: "top-center" });
-            } else {
-              toast.success("Welcome back!", { position: "top-center" });
-            }
-      
-            navigate("/login");
-      
-          } catch (error) {
-            console.error("Error signing up with Google:", error);
-            toast.error("Google sign-up failed", { position: "bottom-center" });
-          }
-      
+  };
+  const googleSignUp = async () => {
+    const provider = new GoogleAuthProvider();
+
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+      const isNewUser = result?.additionalUserInfo?.isNewUser || false;
+
+      console.log("Google user:", user);
+      console.log("Is new user:", isNewUser);
+
+      const userRef = doc(db, "users", user.uid);
+      const userSnap = await getDoc(userRef);
+
+      if (isNewUser || !userSnap.exists()) {
+        await setDoc(userRef, {
+          name: user.displayName,
+          email: user.email,
+          createdAt: new Date(),
+        });
+
+        toast.success("Welcome! Your account has been created.", {
+          position: "top-center",
+        });
+      } else {
+        toast.success("Welcome back!", { position: "top-center" });
+      }
+
+      navigate("/login");
+    } catch (error) {
+      console.error("Error signing up with Google:", error);
+      toast.error("Google sign-up failed", { position: "bottom-center" });
     }
-  
+  };
+  const facebookSignUp = async () => {
+    const provider = new FacebookAuthProvider();
 
+    try {
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+      const isNewUser = result?.additionalUserInfo?.isNewUser || false;
 
+      console.log("Facebook user:", user);
+      console.log("Is new user:", isNewUser);
+
+      const userRef = doc(db, "users", user.uid);
+      const userSnap = await getDoc(userRef);
+
+      if (isNewUser || !userSnap.exists()) {
+        await setDoc(userRef, {
+          name: user.displayName,
+          email: user.email,
+          createdAt: new Date(),
+        });
+
+        toast.success("Welcome! Your account has been created.", {
+          position: "top-center",
+        });
+      } else {
+        toast.success("Welcome back!", { position: "top-center" });
+      }
+
+      navigate("/login");
+    } catch (error) {
+      console.error("Error signing up with Facebook:", error);
+      toast.error("Facebook sign-up failed", { position: "bottom-center" });
+    }
+  };
 
   return (
     <section className=" grid place-items-center bg-[#D9D9D9] md:h-screen  ">
@@ -96,8 +129,7 @@ const SignUp = () => {
               To keep connected with us please login with your personal info{" "}
             </p>
             <button className="max-[770px]:mb-5 border-2 border-white inline-block text-white hover:bg-white rounded-full px-12 py-2 font-semibold mt-5 hover:text-[#77DD77] w-full">
-              <Link to = "/login">              Sign In
-              </Link>
+              <Link to="/login"> Sign In</Link>
             </button>
           </div>
         </div>
@@ -118,12 +150,14 @@ const SignUp = () => {
 
             <div className="flex justify-center gap-x-4 my-2">
               <a
+                onClick={googleSignUp}
                 href="#"
                 className="border-2 border-gray-200 mx-1 p-2 rounded-[50%] hover:border-[#77DD77] "
               >
-                <FaGoogle onClick={googleSignIn} className="w-6 h-6 text-black hover:text-[#77DD77]" />
+                <FaGoogle className="w-6 h-6 text-black hover:text-[#77DD77]" />
               </a>
               <a
+                onClick={facebookSignUp}
                 href="#"
                 className="border-2 border-gray-200 mx-1 p-2 rounded-[50%] hover:border-[#77DD77]"
               >
@@ -137,7 +171,10 @@ const SignUp = () => {
               </p>
             </div>
 
-            <form onSubmit={handleRegister} className="grid justify-center gap-y-2">
+            <form
+              onSubmit={handleRegister}
+              className="grid justify-center gap-y-2"
+            >
               <div className="flex items-center border-2 bg-gray-100 border-gray-200 p-2 rounded-lg ">
                 <MdAccountCircle className="text-2xl text-gray-400 font-light" />
                 <input
@@ -169,17 +206,15 @@ const SignUp = () => {
                 />
               </div>
               <div className="place-self-center my-5">
-              <button
-                type="submit"
-                className=" border-2 border-[#77DD77] inline-block text-black hover:bg-[#77DD77] rounded-full px-12 py-2 font-semibold mb-2 hover:text-white w-full"
-              >
-                Sign up
-              </button>
-              <div className="text-center text-sm text-gray-600" />
-            </div>
+                <button
+                  type="submit"
+                  className=" border-2 border-[#77DD77] inline-block text-black hover:bg-[#77DD77] rounded-full px-12 py-2 font-semibold mb-2 hover:text-white w-full"
+                >
+                  Sign up
+                </button>
+                <div className="text-center text-sm text-gray-600" />
+              </div>
             </form>
-           
-            
           </div>
         </div>
       </div>
