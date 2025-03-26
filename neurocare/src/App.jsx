@@ -9,10 +9,12 @@ import Resources from "./pages/Resources/Resources";
 import Settings from "./pages/SettingsProfile/Settings";
 import { ToastContainer } from "react-toastify";
 import { AuthProvider, ProtectedRoute } from "./Components/Firebase/session.jsx";
+import { SentimentProvider } from "../src/context/SentimentContext.jsx";
 const App = () => {
   return (
     <div>
       <AuthProvider>
+        <SentimentProvider>
         <Router>
           <Routes>
             <Route path="/" element={<LandingPage />} />
@@ -65,6 +67,7 @@ const App = () => {
             />
           </Routes>
         </Router>
+        </SentimentProvider>
       </AuthProvider>
 
       <ToastContainer />

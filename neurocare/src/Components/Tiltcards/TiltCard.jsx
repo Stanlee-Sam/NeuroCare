@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
 import TiltCardItem from "./TiltCardItem"; // Adjust the path if needed
+import { auth } from "../../Components/Firebase/firebase";
 
 const Cards = () => {
   const [journalEntries, setJournalEntries] = useState([]);
@@ -8,10 +8,24 @@ const Cards = () => {
   useEffect(() => {
     const fetchJournalEntries = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/journal");
-        const sortedEntries = response.data.sort(
+        const token = await auth.currentUser.getIdToken();
+
+        const response = await fetch("http://localhost:5000/api/journal", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error("Error fetching journal entries");
+        }
+
+        const data = await response.json();
+
+        const sortedEntries = data.sort(
           (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
         );
+
         setJournalEntries(sortedEntries.slice(0, 3));
       } catch (error) {
         console.error("Error fetching journal entries:", error);

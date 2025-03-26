@@ -9,12 +9,8 @@ import { MdHistory } from "react-icons/md";
 import { trackFeatureUsage } from "../../../utils/FeatureInteraction.js";
 import { CiCirclePlus } from "react-icons/ci";
 import { IoBulbOutline } from "react-icons/io5";
-
-
-
-
-
-
+import { auth } from "../../Components/Firebase/firebase.js";
+import { useSentiment } from "../../context/SentimentContext.jsx";
 
 const NeuroBot = () => {
   useEffect(() => {
@@ -22,7 +18,8 @@ const NeuroBot = () => {
   }, []);
 
   const inputRef = useRef();
-  const messagesEndRef = useRef(null)
+  const messagesEndRef = useRef(null);
+  const { sentiment, journalText } = useSentiment();
 
   const [chats, setChats] = useState([
     {
@@ -37,7 +34,7 @@ const NeuroBot = () => {
   const [hasStartedChat, setHasStartedChat] = useState(false);
 
   useEffect(() => {
-    if(messagesEndRef.current){
+    if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [currentChat.messages]);
@@ -72,7 +69,7 @@ const NeuroBot = () => {
     setCurrentChat((prevChat) => ({ ...prevChat, messages: newMessages }));
 
     try {
-      const botResponse = await  getBotResponse(userMessage)
+      const botResponse = await getBotResponse(userMessage);
 
       const updatedMessages = [
         ...newMessages,
@@ -81,102 +78,119 @@ const NeuroBot = () => {
 
       setChats((prevChats) =>
         prevChats.map((chat) =>
-          chat.id === currentChat.id? {...chat, messages: updatedMessages } : chat
+          chat.id === currentChat.id
+            ? { ...chat, messages: updatedMessages }
+            : chat
         )
       );
-      setCurrentChat((prevChat) => ({...prevChat, messages: updatedMessages }));
-
-    }catch(error){
+      setCurrentChat((prevChat) => ({
+        ...prevChat,
+        messages: updatedMessages,
+      }));
+    } catch (error) {
       console.error("Error calling Gemini API :", error);
 
       const errorMessages = [
         ...newMessages,
-        { role: "bot", text: "Sorry, something went wrong. Please try again later." },
+        {
+          role: "bot",
+          text: "Sorry, something went wrong. Please try again later.",
+        },
       ];
       setChats((prevChats) =>
         prevChats.map((chat) =>
-          chat.id === currentChat.id ? { ...chat, messages: errorMessages } : chat
+          chat.id === currentChat.id
+            ? { ...chat, messages: errorMessages }
+            : chat
         )
       );
       setCurrentChat((prevChat) => ({ ...prevChat, messages: errorMessages }));
     }
-
-  }
+  };
   const addPunctuation = (text) => {
     // Remove markdown bold formatting if present
     text = text.replace(/\*\*(.*?)\*\*/g, "$1");
-  
+
     // Replace bullet asterisks at the start of lines with a dash and a space.
     text = text.replace(/^\*\s+/gm, "- ");
-  
+
     // If stray asterisks appear inline that you don't need, you can remove them:
     // text = text.replace(/\*/g, "");
-  
+
     // Collapse multiple punctuation marks into one
     text = text.replace(/([.!?])(?:\s*[.!?])+/g, "$1");
-  
+
     // Ensure there's a space after punctuation if it’s not there already
     text = text.replace(/([.!?])(?=[^\s])/g, "$1 ");
-  
+
     // Insert an HTML line break (<br>) before a bullet if not already on a new line.
     text = text.replace(/([^\n])\s*-\s+/g, "$1<br>- ");
-  
+
     // Remove any extra spaces and trim the text
     text = text.replace(/\s{2,}/g, " ").trim();
-  
+
     return text;
   };
-  
-  
 
   const clientCleanText = (text) => {
     // Collapse duplicate punctuation marks (e.g., ".." or "!!!")
     text = text.replace(/([.!?])([.!?]+)/g, "$1");
-  
+
     // Ensure a space after punctuation if it’s immediately followed by a letter or number.
     text = text.replace(/([.!?])(?=[A-Za-z0-9])/g, "$1 ");
-  
+
     // Remove extra spaces
     text = text.replace(/\s{2,}/g, " ").trim();
-  
+
     return text;
   };
-  
 
   const getBotResponse = async (userMessage) => {
     try {
-        const response = await fetch('http://localhost:5000/api/chat', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ userMessage })
-        });
+      const token = await auth.currentUser.getIdToken();
 
+      const payload = {
+        userMessage,
+        journalEntry: journalText,
+        sentiment: sentiment ? sentiment : null,
         
-        if (!response.ok) {
-            throw new Error('Failed to get response from the server');
-        }
+      };
 
-        const data = await response.json(); 
-        console.log("Bot Response:", data); 
+      const response = await fetch("http://localhost:5000/api/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      });
 
-        const cleanedResponse = clientCleanText(addPunctuation(data.reply));
+      if (!response.ok) {
+        throw new Error("Failed to get response from the server");
+      }
 
-        return cleanedResponse; 
-      } catch (error) {
-        console.error("Error:", error); 
-        return "Sorry, something went wrong. Please try again.";
+      const data = await response.json();
+      console.log("Bot Response:", data);
+
+      const cleanedResponse = clientCleanText(addPunctuation(data.reply));
+
+      return cleanedResponse;
+    } catch (error) {
+      console.error("Error:", error);
+      return "Sorry, something went wrong. Please try again.";
     }
-};
-
+  };
 
   return (
     <div className="flex max-h-screen bg-[#D9D9D9] overflow-x-hidden">
       <Sidebar />
       <div className="text-2xl h-screen flex flex-col items-center flex-1 w-full">
         <div className="h-20 w-20 md:h-15 md:w-15">
-          <img className="w-15 h-15" src="../../../src/assets/NeuroBot Logo.png" alt="" />
+          <img
+            className="w-15 h-15"
+            src="../../../src/assets/NeuroBot Logo.png"
+            alt=""
+          />
         </div>
         <div className="flex flex-row gap-1 pl-10 md:pl-14 h-screen pb-3 w-full">
           <div className="w-full px-4">
@@ -234,11 +248,14 @@ const NeuroBot = () => {
               <div className="flex flex-col space-y-3 pb-16 md:pb-20">
                 {currentChat.messages.map((message, index) => (
                   <div
-  key={index}
-  className={`p-3 rounded-lg ${message.role === "user" ? "bg-[#608BC1] text-white self-end max-w-[80%] text-[18px]" : "text-black w-full text-[18px]"}`}
-  dangerouslySetInnerHTML={{ __html: message.text }} // This will allow HTML to be rendered
-/>
-
+                    key={index}
+                    className={`p-3 rounded-lg ${
+                      message.role === "user"
+                        ? "bg-[#608BC1] text-white self-end max-w-[80%] text-[18px]"
+                        : "text-black w-full text-[18px]"
+                    }`}
+                    dangerouslySetInnerHTML={{ __html: message.text }} // This will allow HTML to be rendered
+                  />
                 ))}
                 <div ref={messagesEndRef} />
               </div>
@@ -268,12 +285,20 @@ const NeuroBot = () => {
           </div>
 
           {/* Chat History Sidebar */}
-          <div className={`bg-gray-100 border-r rounded-l-lg fixed right-0 ${open ? "md:w-1/4" : "w-[40px]"}`}>
+          <div
+            className={`bg-gray-100 border-r rounded-l-lg fixed right-0 ${
+              open ? "md:w-1/4" : "w-[40px]"
+            }`}
+          >
             {open ? (
               <div>
-                <div className="p-4 font-bold text-xl border-b">Chat History</div>
+                <div className="p-4 font-bold text-xl border-b">
+                  Chat History
+                </div>
                 <img
-                  className={`${open && "rotate-180"} w-7 absolute bottom-[50%] -left-3 cursor-pointer rounded-full border-2 border-[#77DD77]`}
+                  className={`${
+                    open && "rotate-180"
+                  } w-7 absolute bottom-[50%] -left-3 cursor-pointer rounded-full border-2 border-[#77DD77]`}
                   onClick={() => setOpen(!open)}
                   src="../../../src/assets/left-arrow.jpg"
                   alt=""

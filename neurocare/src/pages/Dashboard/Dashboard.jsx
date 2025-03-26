@@ -10,10 +10,11 @@ import Topbar from "../../Components/Topbar/Topbar";
 import { BiSolidDownArrow, BiSolidUpArrow } from "react-icons/bi";
 import { useEffect, useState } from "react";
 import StressProgressBar from "../../Components/ProgressBar/StressProgressBar";
-import { trackFeatureUsage } from "../../../utils/FeatureInteraction.js"
-import {Link} from "react-router-dom";
+import { trackFeatureUsage } from "../../../utils/FeatureInteraction.js";
+import { Link } from "react-router-dom";
+import { auth } from "../../Components/Firebase/firebase";
 
-import PropTypes from 'prop-types';
+import PropTypes from "prop-types";
 import { FaClipboardList } from "react-icons/fa";
 // import axios from "axios";
 
@@ -28,33 +29,40 @@ function Number({ n }) {
 }
 
 const Dashboard = () => {
-
   const [journalEntries, setJournalEntries] = useState([]);
   const [averageStress, setAverageStress] = useState(0);
   // const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentSentiment, setCurrentSentiment] = useState(0);
-const [sentimentChange, setSentimentChange] = useState(0);
-const [mostFrequentMood, setMostFrequentMood] = useState("N/A");
-const [totalEntries, setTotalEntries] = useState(0);
+  const [sentimentChange, setSentimentChange] = useState(0);
+  const [mostFrequentMood, setMostFrequentMood] = useState("N/A");
+  const [totalEntries, setTotalEntries] = useState(0);
 
-
-useEffect(() => {
-  trackFeatureUsage("Dashboard");
-}, [])
-
-  
   useEffect(() => {
-      const fetchJournalEntries = async () => {
-        try {
-          const response = await fetch("http://localhost:5000/api/journal");
-          if(!response.ok){
-            throw new Error("Network response was not ok");
-          }
-          const data = await response.json();
-          console.log("Journal Entries:", data);
-  
-           const sortedData = data.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+    trackFeatureUsage("Dashboard");
+  }, []);
+
+  useEffect(() => {
+    const fetchJournalEntries = async () => {
+      try {
+        const token = await auth.currentUser.getIdToken();
+
+
+        const response = await fetch("http://localhost:5000/api/journal", {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`, 
+          },
+        });
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        const data = await response.json();
+        console.log("Journal Entries:", data);
+
+        const sortedData = data.sort(
+          (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
+        );
         setJournalEntries(sortedData);
       } catch (error) {
         console.error("Error fetching journal entries", error);
@@ -63,78 +71,86 @@ useEffect(() => {
         // setLoading(false);
       }
     };
-  
-      fetchJournalEntries();
-    }, []);
-    useEffect(() => {
-      // Function to calculate average stress level for today
-      const calculateAverageStress = (entries) => {
-        if (entries.length === 0) return 0;
-        const totalStress = entries.reduce((sum, entry) => sum + entry.level, 0);
-        return Math.round(totalStress / entries.length);
-      };
-  
-      // Filter entries for today
-      const todayEntries = journalEntries.filter((entry) => {
-        const entryDate = new Date(entry.createdAt).toDateString();
-        return entryDate === new Date().toDateString();
-      });
-  
-      setAverageStress(calculateAverageStress(todayEntries));
-    }, [journalEntries]);
 
-    useEffect(() => {
-      const calculateAverageSentiment = (entries) => {
-        if (entries.length === 0) return 0;
-        const totalSentiment = entries.reduce((sum, entry) => sum + entry.sentimentScore, 0);
-        return (totalSentiment / entries.length).toFixed(2); // Keep two decimal places
-      };
-    
-      const todayEntries = journalEntries.filter((entry) => {
-        return new Date(entry.createdAt).toDateString() === new Date().toDateString();
-      });
-    
-      const yesterdayEntries = journalEntries.filter((entry) => {
-        const yesterday = new Date();
-        yesterday.setDate(yesterday.getDate() - 1);
-        return new Date(entry.createdAt).toDateString() === yesterday.toDateString();
-      });
-    
-      const todaySentiment = parseFloat(calculateAverageSentiment(todayEntries));
-      const yesterdaySentiment = parseFloat(calculateAverageSentiment(yesterdayEntries));
-    
-      const sentimentChange = yesterdaySentiment
-        ? ((todaySentiment - yesterdaySentiment) / yesterdaySentiment) * 100
-        : 0; // Avoid division by zero
-    
-      setCurrentSentiment(todaySentiment);
-      setSentimentChange(sentimentChange.toFixed(2)); // Keep two decimal places
-    }, [journalEntries]);
+    fetchJournalEntries();
+  }, []);
+  useEffect(() => {
+    // Function to calculate average stress level for today
+    const calculateAverageStress = (entries) => {
+      if (entries.length === 0) return 0;
+      const totalStress = entries.reduce((sum, entry) => sum + entry.level, 0);
+      return Math.round(totalStress / entries.length);
+    };
 
-    useEffect(() => {
-      const findMostFrequentMood = (entries) => {
-        if (entries.length === 0) return "N/A";
-    
-        const moodCount = entries.reduce((acc, entry) => {
-          acc[entry.sentiment] = (acc[entry.sentiment] || 0) + 1;
-          return acc;
-        }, {});
-    
-        return Object.keys(moodCount).reduce((a, b) => (moodCount[a] > moodCount[b] ? a : b));
-      };
-    
-      setMostFrequentMood(findMostFrequentMood(journalEntries));
-    }, [journalEntries]);
+    // Filter entries for today
+    const todayEntries = journalEntries.filter((entry) => {
+      const entryDate = new Date(entry.createdAt).toDateString();
+      return entryDate === new Date().toDateString();
+    });
 
-    useEffect(() => {
-      setTotalEntries(journalEntries.length);
-    }, [journalEntries]);
-    
-    
-    
+    setAverageStress(calculateAverageStress(todayEntries));
+  }, [journalEntries]);
 
-    if (error) return <p>Error : {error}</p>
-  
+  useEffect(() => {
+    const calculateAverageSentiment = (entries) => {
+      if (entries.length === 0) return 0;
+      const totalSentiment = entries.reduce(
+        (sum, entry) => sum + entry.sentimentScore,
+        0
+      );
+      return (totalSentiment / entries.length).toFixed(2); // Keep two decimal places
+    };
+
+    const todayEntries = journalEntries.filter((entry) => {
+      return (
+        new Date(entry.createdAt).toDateString() === new Date().toDateString()
+      );
+    });
+
+    const yesterdayEntries = journalEntries.filter((entry) => {
+      const yesterday = new Date();
+      yesterday.setDate(yesterday.getDate() - 1);
+      return (
+        new Date(entry.createdAt).toDateString() === yesterday.toDateString()
+      );
+    });
+
+    const todaySentiment = parseFloat(calculateAverageSentiment(todayEntries));
+    const yesterdaySentiment = parseFloat(
+      calculateAverageSentiment(yesterdayEntries)
+    );
+
+    const sentimentChange = yesterdaySentiment
+      ? ((todaySentiment - yesterdaySentiment) / yesterdaySentiment) * 100
+      : 0; // Avoid division by zero
+
+    setCurrentSentiment(todaySentiment);
+    setSentimentChange(sentimentChange.toFixed(2)); // Keep two decimal places
+  }, [journalEntries]);
+
+  useEffect(() => {
+    const findMostFrequentMood = (entries) => {
+      if (entries.length === 0) return "N/A";
+
+      const moodCount = entries.reduce((acc, entry) => {
+        acc[entry.sentiment] = (acc[entry.sentiment] || 0) + 1;
+        return acc;
+      }, {});
+
+      return Object.keys(moodCount).reduce((a, b) =>
+        moodCount[a] > moodCount[b] ? a : b
+      );
+    };
+
+    setMostFrequentMood(findMostFrequentMood(journalEntries));
+  }, [journalEntries]);
+
+  useEffect(() => {
+    setTotalEntries(journalEntries.length);
+  }, [journalEntries]);
+
+  if (error) return <p>Error : {error}</p>;
+
   return (
     <div className="flex bg-[#D9D9D9]">
       <Sidebar />
@@ -144,7 +160,6 @@ useEffect(() => {
           <Topbar />
         </div>
         <div className="space-y-4 pl-10 md:pl-14 pb-10 md:pb-5 max-w-full">
-          
           <div className="grid gap-2 md:flex max-w-full">
             {/* LEFT */}
             <div className="md:w-4/6 max-w-full flex flex-col gap-4">
@@ -157,8 +172,7 @@ useEffect(() => {
                     What&apos;s your mood today?
                   </p>
                   <button className="text-black font-semibold rounded-md text-sm p-2 bg-[#77DD77] hover:bg-[#77DD77] hover:text-white ">
-                    <Link to="/journal">                    Log Mood
-                    </Link>
+                    <Link to="/journal"> Log Mood</Link>
                   </button>
                 </div>
                 <div className="md:w-[45%] w-full flex flex-col gap-2 md:grid md:grid-cols-2 ">
@@ -169,18 +183,23 @@ useEffect(() => {
                     <div className="flex justify-evenly items-center">
                       <span className="font-bold text-[20px]">
                         <Number n={currentSentiment} />
-
                       </span>
                       <span className="relative">
                         {sentimentChange >= 0 ? (
                           <BiSolidUpArrow className="text-[#207613] animate-bounce" />
-                          
                         ) : (
-                          <BiSolidDownArrow  className="text-[#B22222] animate-bounce" />
+                          <BiSolidDownArrow className="text-[#B22222] animate-bounce" />
                         )}
-                        <p className="text-[10px]  absolute top-3" style = {{color : sentimentChange >= 0 ? "#207613" : "#B22222"}}>
-                          {sentimentChange >= 0 ? `+${sentimentChange}%` : `${sentimentChange}%`}
-                          </p>
+                        <p
+                          className="text-[10px]  absolute top-3"
+                          style={{
+                            color: sentimentChange >= 0 ? "#207613" : "#B22222",
+                          }}
+                        >
+                          {sentimentChange >= 0
+                            ? `+${sentimentChange}%`
+                            : `${sentimentChange}%`}
+                        </p>
                       </span>
                     </div>
                   </div>
@@ -189,11 +208,19 @@ useEffect(() => {
                       Most Frequent Mood
                     </h3>
                     <div className="flex justify-evenly items-center">
-                      <span className="text-[15px] font-bold">{mostFrequentMood}</span>
+                      <span className="text-[15px] font-bold">
+                        {mostFrequentMood}
+                      </span>
                       <span className="">
-                        {mostFrequentMood === "Positive" &&<p className="text-[20px] text-[#207613] ">🙂</p>}
-                        {mostFrequentMood === "Neutral" && <p className="text-[20px] text-[#A76A1B] ">😐</p>}
-      {mostFrequentMood === "Negative" && <p className="text-[20px] text-[#B20E0E] ">😞</p>}
+                        {mostFrequentMood === "Positive" && (
+                          <p className="text-[20px] text-[#207613] ">🙂</p>
+                        )}
+                        {mostFrequentMood === "Neutral" && (
+                          <p className="text-[20px] text-[#A76A1B] ">😐</p>
+                        )}
+                        {mostFrequentMood === "Negative" && (
+                          <p className="text-[20px] text-[#B20E0E] ">😞</p>
+                        )}
                       </span>
                     </div>
                   </div>
@@ -209,7 +236,6 @@ useEffect(() => {
                       </div>
                     </div>
                     <p className="text-sm text-center">Total entries</p>
-                    
                   </div>
                   <div className="flex flex-col bg-white rounded-lg p-4 transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-130 hover:shadow-2xl ">
                     <h3 className="text-[15px] font-light text-center">
@@ -233,7 +259,7 @@ useEffect(() => {
                 <div className="toggleButton"></div>
                 <div className="flex flex-col md:grid md:grid-cols-2 gap-2 w-full ">
                   <div className="line-chart ">
-                    <SentimentChart journalEntries = {journalEntries}/>
+                    <SentimentChart journalEntries={journalEntries} />
                   </div>
                   <div className="bar-chart">
                     <StressLevels />
@@ -267,7 +293,5 @@ useEffect(() => {
 Number.propTypes = {
   n: PropTypes.number.isRequired,
 };
-
-
 
 export default Dashboard;

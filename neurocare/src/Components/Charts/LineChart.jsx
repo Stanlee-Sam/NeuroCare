@@ -26,52 +26,7 @@ const SentimentChart = ({ journalEntries = [] }) => {
     setTimeSpan("daily"); 
   }, [journalEntries]);
 
-  // const formatData = (entries, period) => {
-  //   console.log("Entries received in formatData:", entries);
-  //   const groupedData = {};
-
-  //   const today = new Date().toLocaleDateString("en-US", { timeZone: "Africa/Nairobi" });
-    
-
-  //   entries.forEach((entry) => {
-  //     console.log("Processing entry:", entry);
-  //     const date = new Date(entry.createdAt);
-
-  //     const localDate = new Date(date.toLocaleString("en-US", { timeZone: "Africa/Nairobi" }));
-
-  //     const entryDate = localDate.toLocaleDateString("en-US", { timeZone: "Africa/Nairobi" });
-
-  //     let key;
-  //     if (period === "daily") {
-
-  //       if(entryDate !== today) return;
-
-  //       key = `${localDate.getHours()}:00`; 
-  //     } else if (period === "weekly") {
-  //       const weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-  //       key = weekdays[localDate.getDay()]; 
-  //     } else if (period === "monthly") {
-  //       key = `Week ${Math.ceil(localDate.getDate() / 7)}`; 
-  //     }
-
-  //     console.log("Grouping Entry:", entry.id, "| Date:", localDate, "| Key:", key);
-
-  //     if (!groupedData[key]) {
-  //       groupedData[key] = { name: key, sentiment: 0, count: 0 };
-  //     }
-  //     groupedData[key].sentiment += entry.sentimentScore;
-  //     groupedData[key].count += 1;
-  //   });
-
-  //   const formattedData = Object.values(groupedData).map((item) => ({
-  //     name: item.name,
-  //     sentiment: item.count > 0 ? Number((item.sentiment / item.count).toFixed(2)) : 0,
-  //   }))
-  //   .sort((a, b) => a.name.localeCompare(b.name)); 
-
-  //   console.log("Formatted Data:", formattedData);
-  //   return formattedData;
-  // };
+  
 
   const formatData = (entries, period) => {
     console.log("Entries received in formatData:", entries);
@@ -149,7 +104,7 @@ const SentimentChart = ({ journalEntries = [] }) => {
     console.log("Processing journalEntries:", journalEntries);
     if (journalEntries.length > 0) {
       const sortedEntries = [...journalEntries].sort(
-        (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
       );
   
       const formatted = formatData(sortedEntries, timeSpan);

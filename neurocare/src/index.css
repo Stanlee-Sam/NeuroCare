@@ -21,21 +21,13 @@
   z-index: 10 !important;
   
 }
-/* @media (max-width: 450px) {
-  .react-calendar {
-    width: 280px !important;
-  }
-} */
+
 @media (max-width: 380px) {
   .react-calendar {
     width: 230px !important;
   }
 }
-/* @media (max-width: 715px) {
-  .react-calendar {
-    width: full !important;
-  }
-} */
+
 @media (max-width: 820px) {
   .react-calendar {
     width: 200px !important;

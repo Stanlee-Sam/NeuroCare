@@ -23,29 +23,39 @@ const SignUp = () => {
 
   const handleRegister = async (e) => {
     e.preventDefault();
+  
+    if (!name || !email || !password) {
+      toast.error("Please fill in all fields!", { position: "top-center" });
+      return;
+    }
+  
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
-      const user = auth.currentUser;
-      console.log(user);
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+  
       if (user) {
-        await setDoc(doc(db, "Users", user.uid), {
+        await setDoc(doc(db, "users", user.uid), {
           name: name,
           email: user.email,
+          createdAt: new Date(),
         });
+  
+        console.log("User registered successfully!");
+        toast.success("User registered successfully!", { position: "top-center" });
+        navigate("/login");
       }
-
-      console.log("User registered successfully!");
-      toast.success("User registered successfully!", {
-        position: "top-center",
-      });
-      navigate("/login");
     } catch (error) {
       console.error("Error registering user:", error);
-      toast.error("Failed to register user. Please try again.", {
-        position: "bottom-center",
-      });
+  
+      if (error.code === "auth/email-already-in-use") {
+        toast.error("This email is already registered. Try logging in.", { position: "bottom-center" });
+      } else {
+        toast.error("Failed to register user. Please try again.", { position: "bottom-center" });
+      }
     }
   };
+  
+  
   const googleSignUp = async () => {
     const provider = new GoogleAuthProvider();
 
@@ -223,3 +233,4 @@ const SignUp = () => {
 };
 
 export default SignUp;
+

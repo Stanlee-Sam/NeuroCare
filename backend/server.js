@@ -6,15 +6,20 @@ const sentimentRoutes = require('./routes/sentiment.routes.js')
 const featureRoutes = require('./routes/feature.routes.js')
 const journalRoutes = require('./routes/journal.routes.js')
 const chatRoutes = require('./routes/chat.routes.js')
+const authRoutes = require('./routes/auth.routes.js')
 const bodyParser = require('body-parser');
 const errorHandler = require("./middleware/feature.middleware.js")
+const authenticate = require("./middleware/authenticate.js")
 
 dotenv.config();
 const app = express();
 const prisma = new PrismaClient();
 
-app.use(cors());
-app.use(express.json());
+app.use(cors({
+  origin: 'http://localhost:5173',
+  credentials: true,
+  allowedHeaders: ["Content-Type", "Authorization"]
+}));app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.get("/", (req, res) => {
@@ -22,11 +27,15 @@ app.get("/", (req, res) => {
 });
 
 //Routes
-app.use('/api', sentimentRoutes);
-app.use('/api/journal', journalRoutes);
-app.use('/api', featureRoutes)
-app.use('/api', chatRoutes)
+app.use('/api/auth', authRoutes)
 
+app.use('/api', authenticate, sentimentRoutes);
+app.use('/api/journal', authenticate, journalRoutes);
+app.use('/api', authenticate, featureRoutes)
+app.use('/api', authenticate, chatRoutes)
+
+
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

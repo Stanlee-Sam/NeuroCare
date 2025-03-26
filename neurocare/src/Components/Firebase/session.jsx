@@ -13,10 +13,12 @@ export const AuthContext = createContext();
 // AuthProvider Component to manage user session
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setUser(user);
+      setLoading(false);
       if (user) {
         console.log("User logged in:", user);
       } else {
@@ -26,6 +28,10 @@ export const AuthProvider = ({ children }) => {
 
     return () => unsubscribe();
   }, []);
+
+  if (loading) {
+    return <div>Loading...</div>
+  }
 
   return (
     <AuthContext.Provider value={{ user }}>

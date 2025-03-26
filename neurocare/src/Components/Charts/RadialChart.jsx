@@ -1,6 +1,5 @@
 "use client";
 import { useEffect, useState } from "react";
-import axios from "axios";
 import { MdDashboard } from "react-icons/md";
 import { IoJournal } from "react-icons/io5";
 import { FaRobot } from "react-icons/fa";
@@ -8,23 +7,36 @@ import { SlOptions } from "react-icons/sl";
 import { FaCalendarAlt } from "react-icons/fa";
 import { RadialBarChart, RadialBar, ResponsiveContainer } from "recharts";
 import { GoGear } from "react-icons/go";
-
+import { auth } from "../../Components/Firebase/firebase";
+import axios from "axios";
 const FeatureInteraction = () => {
   const [data, setData] = useState([]);
 
   // Function to fetch feature usage data
   const fetchFeatureUsage = async () => {
     try {
-      const response = await axios.get(
-        "http://localhost:5000/api/feature-usage"
-      ); // Backend API
-      const featureData = response.data.map((item) => ({
+      const token = await auth.currentUser.getIdToken();
+
+      const response = await fetch("http://localhost:5000/api/feature-usage", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error("Error fetching feature usage data");
+      }
+
+      const data = await response.json();
+
+      const featureData = data.map((item) => ({
         name: item.feature,
         count: item.count,
-        fill: getColorForFeature(item.feature), // Assign colors
+        fill: getColorForFeature(item.feature),
       }));
 
       setData(featureData);
+      console.log("Feature Usage Data:", featureData);
     } catch (error) {
       console.error("Error fetching feature usage data:", error);
     }
@@ -33,10 +45,19 @@ const FeatureInteraction = () => {
   // Function to track feature usage
   const trackFeatureUsage = async (featureName) => {
     try {
+      console.log("Tracking feature usage:", featureName);
+
+      const token = await auth.currentUser.getIdToken();
       await axios.post("http://localhost:5000/api/track-feature", {
         feature: featureName,
+          headers: {
+            Authorization: `Bearer ${token}`, 
+          },
+          body: JSON.stringify({ feature: featureName }),
+        
+
       });
-      fetchFeatureUsage(); // Refresh chart
+      fetchFeatureUsage(); 
     } catch (error) {
       console.error("Error tracking feature usage:", error);
     }
@@ -54,7 +75,7 @@ const FeatureInteraction = () => {
       NeuroBot: "#00FFFF",
       Dashboard: "#581845",
     };
-    return colors[feature] || "#888"; // Default color
+    return colors[feature] || "#888"; 
   };
 
   return (

@@ -3,6 +3,7 @@
 import { SlOptions } from "react-icons/sl";
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { auth } from "../../Components/Firebase/firebase.js";
 
 import {
   BarChart,
@@ -103,15 +104,11 @@ const customTooltip = ({ active, payload, label }) => {
   return null;
 };
 
-
 const barColor = (value) => {
-  
-  if (value >= 70) return "#F44336"; 
-  if (value >= 40) return "#FFA500"; 
-  return "#4CAF50"; 
+  if (value >= 70) return "#F44336";
+  if (value >= 40) return "#FFA500";
+  return "#4CAF50";
 };
-
-
 
 const CustomLegend = () => {
   return (
@@ -162,154 +159,125 @@ const CustomLegend = () => {
 const StressLevels = () => {
   const [timeSpan, setTimeSpan] = useState("daily");
   const [stressData, setStressData] = useState([]);
- 
+
   useEffect(() => {
     const fetchStressLevels = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/api/journal/chart?timeSpan=${timeSpan}`);
+        const token = await auth.currentUser.getIdToken();
+        if (!token) {
+          console.error("No auth token found");
+          return;
+        }
+        const response = await axios.get(
+          `http://localhost:5000/api/journal/chart?timeSpan=${timeSpan}`,
+          {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
         console.log("Raw API Response:", response.data);
-  
-        
+
         if (!response.data || response.data.length === 0) {
           console.warn("No data returned from API, using fallback dataset.");
           setStressData(getFallbackData(timeSpan));
           return;
         }
-  
-        
+
         let aggregatedData = aggregateData(response.data, timeSpan);
         console.log("Processed Stress Data:", aggregatedData);
-  
+
         setStressData(aggregatedData);
       } catch (error) {
         console.error("Error fetching stress levels:", error);
-        setStressData(getFallbackData(timeSpan)); 
+        setStressData(getFallbackData(timeSpan));
       }
     };
-  
+
     fetchStressLevels();
   }, [timeSpan]);
+
   
 
-  // const aggregateData = (data, timeSpan) => {
-  //   let groupedData = {};
-  
-  //   data.forEach((entry) => {
-  //     let key = "Unknown";
-  
-  //     if (timeSpan === "daily") {
-  //       key = entry.name;
-  //     } else if (timeSpan === "weekly") {
-  //       let date = new Date(entry.createdAt);
-  //       if (!isNaN(date.getTime())) {
-  //         key = date.toLocaleDateString("en-US", { weekday: "short" });
-  //       }
-  //     } else if (timeSpan === "monthly") {
-  //       let date = new Date(entry.createdAt);
-  //       if (!isNaN(date.getTime())) {
-  //         key = `Week ${Math.ceil(date.getDate() / 7)}`;
-  //       }
-  //     }
-  
-  //     if (!groupedData[key]) {
-  //       groupedData[key] = { total: 0, count: 0 };
-  //     }
-  
-      
-  //     if (typeof entry.Level === "number" && !isNaN(entry.Level)) {
-  //       let normalizedLevel = Math.min(entry.Level, 100); // Cap at 100
-  //       groupedData[key].total += normalizedLevel;
-  //       groupedData[key].count += 1;
-  //     }
-  //   });
-  
-  //   return Object.keys(groupedData).map((key) => {
-  //     const avgStress = groupedData[key].count > 0 ? groupedData[key].total / groupedData[key].count : 0;
-  //     return {
-  //       name: key,
-  //       Level: Math.round(avgStress), 
-  //     };
-  //   });
-  // };
-  
-  
-  
   const aggregateData = (data, timeSpan) => {
     let groupedData = {};
-  
+
     // Get the current date in the desired timezone
     const now = new Date();
-    const localNow = new Date(now.toLocaleString("en-US", { timeZone: "Africa/Nairobi" }));
-    const currentDateString = localNow.toLocaleDateString("en-US", { timeZone: "Africa/Nairobi" });
+    const localNow = new Date(
+      now.toLocaleString("en-US", { timeZone: "Africa/Nairobi" })
+    );
+    const currentDateString = localNow.toLocaleDateString("en-US", {
+      timeZone: "Africa/Nairobi",
+    });
     const currentMonth = localNow.getMonth();
     const currentYear = localNow.getFullYear();
     // Define the current week as the week number within the month
     const currentWeek = Math.ceil(localNow.getDate() / 7);
-  
+
     data.forEach((entry) => {
       const entryDate = new Date(entry.createdAt);
-      const localEntry = new Date(entryDate.toLocaleString("en-US", { timeZone: "Africa/Nairobi" }));
-      
+      const localEntry = new Date(
+        entryDate.toLocaleString("en-US", { timeZone: "Africa/Nairobi" })
+      );
+
       let key = "Unknown";
-  
+
       if (timeSpan === "daily") {
         // Only include entries from today.
-        const entryDateString = localEntry.toLocaleDateString("en-US", { timeZone: "Africa/Nairobi" });
+        const entryDateString = localEntry.toLocaleDateString("en-US", {
+          timeZone: "Africa/Nairobi",
+        });
         if (entryDateString !== currentDateString) return;
-        // Group by the entry name 
-        key = entry.name; 
+        // Group by the entry name
+        key = entry.name;
       } else if (timeSpan === "weekly") {
         // Only include entries that belong to the current week.
         const entryWeek = Math.ceil(localEntry.getDate() / 7);
-        if (localEntry.getMonth() !== currentMonth ||
-            localEntry.getFullYear() !== currentYear ||
-            entryWeek !== currentWeek) {
+        if (
+          localEntry.getMonth() !== currentMonth ||
+          localEntry.getFullYear() !== currentYear ||
+          entryWeek !== currentWeek
+        ) {
           return;
         }
-        // Group by weekday 
+        // Group by weekday
         key = localEntry.toLocaleDateString("en-US", { weekday: "short" });
       } else if (timeSpan === "monthly") {
         // Only include entries from the current month
-        if (localEntry.getMonth() !== currentMonth || localEntry.getFullYear() !== currentYear) {
+        if (
+          localEntry.getMonth() !== currentMonth ||
+          localEntry.getFullYear() !== currentYear
+        ) {
           return;
         }
         // Group by week of the month
         key = `Week ${Math.ceil(localEntry.getDate() / 7)}`;
       }
-  
+
       // Group and accumulate values
       if (!groupedData[key]) {
         groupedData[key] = { total: 0, count: 0 };
       }
       if (typeof entry.Level === "number" && !isNaN(entry.Level)) {
-        const normalizedLevel = Math.min(entry.Level, 100); 
+        const normalizedLevel = Math.min(entry.Level, 100);
         groupedData[key].total += normalizedLevel;
         groupedData[key].count += 1;
       }
     });
-  
+
     return Object.keys(groupedData).map((key) => {
-      const avgStress = groupedData[key].count > 0 ? groupedData[key].total / groupedData[key].count : 0;
+      const avgStress =
+        groupedData[key].count > 0
+          ? groupedData[key].total / groupedData[key].count
+          : 0;
       return { name: key, Level: Math.round(avgStress) };
     });
   };
-  
-  // const shouldIncludeData = (timestamp) => {
-  //   // Allowed hours for filtering, e.g., "10", "2", "4"
-  //   const allowedHours = ["10", "2", "4"];
-  //   const hour = timestamp.split(":")[0]; // Extract hour from something like "10:10 AM"
-  //   console.log("Checking if hour should be included: ", hour);
-  //   return allowedHours.includes(hour);
-  // };
-  
-  
-  
-  
-  
-  
-  
-  
-  
+
+ 
+
   const getFallbackData = (timeSpan) => {
     switch (timeSpan) {
       case "daily":
@@ -322,22 +290,16 @@ const StressLevels = () => {
         return [];
     }
   };
-  
+
   const getData = () => {
     if (stressData.length > 0) {
-      return stressData.map(entry => ({
+      return stressData.map((entry) => ({
         ...entry,
         Level: entry.Level || 0, // Ensure Level is always a number
       }));
     }
     return [];
   };
-  
-  
-  
-  
-
-
 
   return (
     <div className="bg-white max-w-full  rounded-lg p-4 flex flex-col gap-2 transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-130 hover:shadow-2xl ">
@@ -396,12 +358,10 @@ const StressLevels = () => {
 
           <Legend content={<CustomLegend />} />
           <Bar dataKey="Level" radius={[10, 10, 0, 0]}>
-  {getData().map((entry, index) => (
-    <Cell key={`cell-${index}`} fill={barColor(entry.Level)} />
-  ))}
-</Bar>
-
-
+            {getData().map((entry, index) => (
+              <Cell key={`cell-${index}`} fill={barColor(entry.Level)} />
+            ))}
+          </Bar>
         </BarChart>
       </ResponsiveContainer>
     </div>

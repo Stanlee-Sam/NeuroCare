@@ -9,7 +9,8 @@ const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/
 
 
 router.post("/chat", async (req, res) => {
-    const { userMessage } = req.body;
+  console.log("Request payload:", req.body);
+    const { userMessage, sentiment, journalEntry } = req.body;
 
     try {
         const response = await axios.post(GEMINI_API_URL, {
@@ -18,8 +19,15 @@ router.post("/chat", async (req, res) => {
               parts: [
                 // Guiding Instruction for Gemini
                 {
+                  text: `Here is a journal entry written by the user:\n\n"${journalEntry}".\n\nThe detected sentiment is "${sentiment?.mood || 'neutral'}". Please provide a response that acknowledges the specific content of the journal entry while also considering the sentiment until when the user changes the topic so go accordingly to what they say.If the journal entry is null or empty just respond to the entered user message. Avoid generic responses.`
+                },
+                {
                   text: "You are NeuroBot, a compassionate AI therapist. Please generate a response that is fully punctuated with proper spacing, clear sentence breaks, and new lines for each new point or bullet. Use proper grammar and include emojis where appropriate."
                 }
+               
+                
+                
+                
                 ,
                 // {
                 //   text: "You are an anime bot,you give anime recommendations with great back story to make someone gain interest use emoji where necessary."

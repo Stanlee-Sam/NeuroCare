@@ -1,5 +1,3 @@
-
-
 import { useState, useEffect } from "react";
 import Sidebar from "../../Components/Sidebar/Sidebar";
 // import Topbar from "../../Components/Topbar/Topbar";
@@ -8,8 +6,9 @@ import StressLevels from "../../Components/Charts/BarChart";
 import SentimentCategories from "../../Components/Charts/PieChart";
 import Cards from "../../Components/Tiltcards/TiltCard";
 import { toast } from "react-toastify";
-import { trackFeatureUsage } from "../../../utils/FeatureInteraction.js"
-
+import { trackFeatureUsage } from "../../../utils/FeatureInteraction.js";
+import { auth } from "../../Components/Firebase/firebase.js";
+import { useSentiment } from "../../context/SentimentContext.jsx";
 
 const Journal = () => {
   const [selectedChart, setSelectedChart] = useState("line");
@@ -18,38 +17,76 @@ const Journal = () => {
 
   const [journalEntries, setJournalEntries] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  // const [error, setError] = useState(null);
+  const { sentiment, setSentiment,journalText, setJournalText } = useSentiment();
 
   useEffect(() => {
-    trackFeatureUsage("Mood Tracking")
+    trackFeatureUsage("Mood Tracking");
   }, []);
 
-  const saveJournalEntry = async (text, sentiment, sentimentScore, level, userId) => {
+  
+  const saveJournalEntry = async (text, sentiment, sentimentScore, level) => {
     try {
-      const requestBody = { text, sentiment, sentimentScore, level, userId };
-    console.log("Saving Journal Entry:", requestBody);
-
-    const response = await fetch("http://localhost:5000/api/journal/create", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(requestBody),
-      });
-      const data = await response.json();
-      console.log("Response from server",data)
-      if (!response.ok) { 
-        toast.error(data.error || "Failed to save journal entry. Please try again.");
+      const user = auth.currentUser;
+      if (!user) {
+        console.error("No authenticated user found.");
+        toast.error("User not authenticated.");
         return;
       }
-      
-      toast.success("Journal entry saved successfully");
 
+      if (!text || sentimentScore === undefined || !user.uid) {
+        console.error("Missing required fields:", {
+          text,
+          sentimentScore,
+          firebaseUid: user?.uid,
+        });
+        toast.error("Text, sentimentScore, and firebaseUid are required.");
+        return;
+      }
+
+      // Get Firebase Authentication Token
+      const token = await user.getIdToken();
+
+      const entryData = {
+        text,
+        sentiment,
+        sentimentScore,
+        level,
+        userId: user.uid,
+      };
+
+      console.log("Sending Journal Entry Data:", entryData);
+
+      const response = await fetch("http://localhost:5000/api/journal/create", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(entryData),
+      });
+
+      const data = await response.json();
+      console.log("Response from server:", data);
+
+      if (!response.ok) {
+        toast.error(
+          data.error || "Failed to save journal entry. Please try again."
+        );
+        return;
+      }
+
+      toast.success("Journal entry saved successfully");
     } catch (error) {
-      console.error("Error saving journal entry", error);
+      console.error("Error saving journal entry:", error);
       toast.error("Failed to save journal entry. Please try again.");
     }
-  }
+  };
+
+ 
 
   const analyzeSentiment = async (e) => {
+    
     e.preventDefault();
     if (!text.trim())
       return toast.info("Please enter some text to analyze sentiment");
@@ -58,31 +95,55 @@ const Journal = () => {
     setLoading(true);
 
     try {
+      const user = auth.currentUser;
+      if (!user) {
+        toast.error("User not authenticated");
+        return;
+      }
+
+      const userToken = await user.getIdToken();
       const response = await fetch("http://localhost:5000/api/analyze", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text })
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${userToken}`,
+        },
+        body: JSON.stringify({ text }),
       });
-      
+
       const data = await response.json();
 
-      if(!response.ok){
-        
+      if (!response.ok) {
         toast.error("Failed to analyze sentiment. Please try again.");
+        return;
+      }
 
-      } 
-      console.log("Received Sentiment Data:", data); 
+      console.log("Received Sentiment Data:", data);
       setSentimentResult(data);
 
-      const sentimentLabel = data.compound > 0.2 
-      ? "Positive" 
-      : data.compound < -0.2 
-      ? "Negative" 
-      : "Neutral";
-      
-      await saveJournalEntry(text, sentimentLabel, data.compound, 1, 1);
+      // Ensure compound is defined; use 0 as a fallback if not.
+      const sentimentScore = data.compound !== undefined ? data.compound : 0;
+      const sentimentLabel =
+        sentimentScore > 0.2
+          ? "Positive"
+          : sentimentScore < -0.2
+          ? "Negative"
+          : "Neutral";
 
+          setSentiment({
+            mood: sentimentLabel,
+            score: sentimentScore,
+          });
+          setSentiment({
+            mood: sentimentLabel,
+            score: sentimentScore,
+          });
+          setJournalText(text);
+          console.log("Updated sentiment:", { mood: sentimentLabel, score: sentimentScore });
+          
 
+      // Call saveJournalEntry with the correct number of arguments
+      await saveJournalEntry(text, sentimentLabel, sentimentScore, 1);
     } catch (error) {
       console.error("Error analyzing sentiment", error);
       toast.error("Failed to analyze sentiment. Please try again.");
@@ -94,33 +155,42 @@ const Journal = () => {
   useEffect(() => {
     const fetchJournalEntries = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/journal");
-        if(!response.ok){
+        const token = await auth.currentUser.getIdToken();
+        console.log("User ID:", auth.currentUser?.uid);
+
+        const response = await fetch("http://localhost:5000/api/journal", {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        if (!response.ok) {
           throw new Error("Network response was not ok");
         }
         const data = await response.json();
         console.log("Journal Entries:", data);
 
-         const sortedData = data.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
-      setJournalEntries(sortedData);
-    } catch (error) {
-      console.error("Error fetching journal entries", error);
-      setError("Failed to fetch journal entries. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
+        const sortedData = data.sort(
+          (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
+        );
+        setJournalEntries(sortedData);
+      } catch (error) {
+        console.error("Error fetching journal entries", error);
+        // setError("Failed to fetch journal entries. Please try again.");
+      } finally {
+        setLoading(false);
+      }
+    };
 
     fetchJournalEntries();
   }, []);
 
- 
-  if (error) return <p>Error : {error}</p>
+  // if (error) return <p>Error : {error}</p>
 
   const renderChart = () => {
     switch (selectedChart) {
       case "line":
-        return <SentimentChart journalEntries = {journalEntries} />;
+        return <SentimentChart journalEntries={journalEntries} />;
       case "bar":
         return <StressLevels />;
       case "pie":
@@ -181,13 +251,10 @@ const Journal = () => {
           {sentimentResult &&
             (loading ? (
               <div className="flex justify-center items-center p-4">
-        <div
-          className="spinner"
-
-        >
-          <span className="sr-only">Loading...</span>
-        </div>
-      </div>
+                <div className="spinner">
+                  <span className="sr-only">Loading...</span>
+                </div>
+              </div>
             ) : (
               <div>
                 <div>

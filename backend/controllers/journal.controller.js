@@ -1,8 +1,19 @@
-const { getJournalEntries, saveJournalEntry, getAllJournalEntries, getRecentJournalEntries,deleteJournalEntry } = require('../services/journal.service');
+const {
+  getJournalEntries,
+  saveJournalEntry,
+  getAllJournalEntries,
+  getRecentJournalEntries,
+  deleteJournalEntry,
+} = require("../services/journal.service");
 
 exports.getJournalEntries = async (req, res, next) => {
   try {
-    const entries = await getJournalEntries();
+    console.log("User in request:", req.user);
+    const firebaseUid = req.user?.firebaseUid;
+    if (!firebaseUid)
+      return res.status(403).json({ error: "Unauthorized: No user found." });
+
+    const entries = await getJournalEntries(firebaseUid);
     res.json(entries);
   } catch (err) {
     next(err);
@@ -11,7 +22,12 @@ exports.getJournalEntries = async (req, res, next) => {
 
 exports.getJournalEntriesForChart = async (req, res, next) => {
   try {
-    const entries = await getAllJournalEntries(); 
+    console.log("User in request:", req.user);
+    const firebaseUid = req.user?.firebaseUid;
+    if (!firebaseUid)
+      return res.status(403).json({ error: "Unauthorized: No user found." });
+
+    const entries = await getAllJournalEntries(firebaseUid);
     res.json(entries);
   } catch (err) {
     next(err);
@@ -20,47 +36,67 @@ exports.getJournalEntriesForChart = async (req, res, next) => {
 
 exports.getRecentJournalEntriesForHistory = async (req, res, next) => {
   try {
-    const entries = await getRecentJournalEntries(); 
+    console.log("User in request:", req.user);
+    const firebaseUid = req.user?.firebaseUid;
+    if (!firebaseUid)
+      return res.status(403).json({ error: "Unauthorized: No user found." });
+
+    const entries = await getRecentJournalEntries(firebaseUid);
     res.json(entries);
   } catch (err) {
     next(err);
   }
 };
 
-exports.saveJournalEntry = async (req, res, next) => {  
+exports.saveJournalEntry = async (req, res, next) => {
   try {
-    console.log("Request Body:", req.body);
-    const { text, sentiment, sentimentScore, level, userId } = req.body;
+    console.log("User in request:", req.user);
+    const { text, sentiment, sentimentScore, level } = req.body;
+    const firebaseUid = req.user?.firebaseUid;
 
-    if (!text || sentiment === undefined || sentimentScore === undefined || !userId || level === undefined) {
-      return res.status(400).json({ error: "Text, sentimentScore, and userId are required fields." });
+    if (
+      !text ||
+      sentiment === undefined ||
+      sentimentScore === undefined ||
+      !firebaseUid ||
+      level === undefined
+    ) {
+      return res
+        .status(400)
+        .json({
+          error: "Text, sentimentScore, and firebaseUid are required fields.",
+        });
     }
 
-    console.log("Received Data:", req.body);  
-
-    const savedEntry = await saveJournalEntry(text, sentiment, sentimentScore,level, userId);
+    const savedEntry = await saveJournalEntry(
+      text,
+      sentiment,
+      sentimentScore,
+      level,
+      firebaseUid
+    );
 
     res.status(201).json(savedEntry);
   } catch (err) {
     console.error("Error saving journal entry:", err);
-    next(err); 
+    next(err);
   }
 };
-
-  
 
 exports.deleteJournalEntry = async (req, res, next) => {
   try {
     const { id } = req.params;
+    const firebaseUid = req.user?.firebaseUid;
 
-    if (!id) {
-      return res.status(400).json({ error: "Entry ID is required." });
+    if (!id || !firebaseUid) {
+      return res
+        .status(400)
+        .json({ error: "Entry ID and user authentication is required." });
     }
 
-    const deletedEntry = await deleteJournalEntry(id);
+    const deletedEntry = await deleteJournalEntry(id, firebaseUid);
     res.json({ message: "Journal entry deleted successfully.", deletedEntry });
   } catch (err) {
     next(err);
   }
 };
-
