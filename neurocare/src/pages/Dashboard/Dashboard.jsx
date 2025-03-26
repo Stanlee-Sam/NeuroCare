@@ -98,7 +98,7 @@ const Dashboard = () => {
         (sum, entry) => sum + entry.sentimentScore,
         0
       );
-      return (totalSentiment / entries.length).toFixed(2); // Keep two decimal places
+      return (totalSentiment / entries.length).toFixed(1); // Keep two decimal places
     };
 
     const todayEntries = journalEntries.filter((entry) => {
@@ -125,8 +125,11 @@ const Dashboard = () => {
       : 0; // Avoid division by zero
 
     setCurrentSentiment(todaySentiment);
-    setSentimentChange(sentimentChange.toFixed(2)); // Keep two decimal places
-  }, [journalEntries]);
+    setSentimentChange(sentimentChange.toFixed(1)); // Keep two decimal places
+    console.log("Previous Sentiment:", yesterdaySentiment);
+    console.log("Current Sentiment:", currentSentiment);
+    console.log("Calculated Sentiment Change:", sentimentChange);
+      }, [journalEntries]);
 
   useEffect(() => {
     const findMostFrequentMood = (entries) => {
@@ -182,7 +185,7 @@ const Dashboard = () => {
                     </h3>
                     <div className="flex justify-evenly items-center">
                       <span className="font-bold text-[20px]">
-                        <Number n={currentSentiment} />
+                        {currentSentiment} 
                       </span>
                       <span className="relative">
                         {sentimentChange >= 0 ? (

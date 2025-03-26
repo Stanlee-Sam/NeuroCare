@@ -1,12 +1,24 @@
+
 const admin = require('firebase-admin');
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
+require('dotenv').config();
+
+
+let firebaseConfig;
+try {
+  firebaseConfig = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+  // Replace escaped newlines with actual newline characters
+  firebaseConfig.private_key = firebaseConfig.private_key.replace(/\\n/g, '\n');
+} catch (error) {
+  console.error("Error parsing Firebase service account:", error);
+}
 
 // Safe Firebase Initialization
 if (admin.apps.length === 0) {
   try {
     admin.initializeApp({
-      credential: admin.credential.cert(require('../config/neurocare-29244-firebase-adminsdk-fbsvc-3f9373a6a1.json')),
+      credential: admin.credential.cert(firebaseConfig),
     });
   } catch (error) {
     console.error("Firebase initialization error:", error);

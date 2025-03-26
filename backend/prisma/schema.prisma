@@ -42,8 +42,8 @@ model JournalEntry {
   sentiment      String
   sentimentScore Float
   level          Int?      
-  // createdAt      DateTime @default(now())
-  createdAt      DateTime?
+  createdAt      DateTime @default(now())
+  // createdAt      DateTime?
   userId         String  
   user           User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
