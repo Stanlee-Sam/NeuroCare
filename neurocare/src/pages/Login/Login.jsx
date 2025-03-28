@@ -14,6 +14,17 @@ import { auth, db } from "../../Components/Firebase/firebase";
 import { setDoc, doc, getDoc } from "firebase/firestore";
 
 import { toast } from "react-toastify";
+import * as Yup from "yup";
+
+const loginSchema = Yup.object().shape({
+  email: Yup.string()
+    .email("Invalid email format")
+    .required("Email is required"),
+  password: Yup.string()
+    .min(6, "Password must be at least 6 characters")
+    .required("Password is required"),
+});
+
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -22,6 +33,17 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    try {
+      await loginSchema.validate({ email, password }, { abortEarly: false });
+    } catch (err) {
+      err.inner.forEach((error) =>
+        toast.error(error.message, { position: "top-center" })
+      );
+      return;
+    }
+
+
     try {
       await signInWithEmailAndPassword(auth, email, password);
       console.log("User logged in successfully!");

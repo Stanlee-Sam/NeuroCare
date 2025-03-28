@@ -14,6 +14,19 @@ import {
 import { auth, db } from "../../Components/Firebase/firebase";
 import { setDoc, doc, getDoc } from "firebase/firestore";
 import { toast } from "react-toastify";
+import * as Yup from "yup";
+
+const validationSchema = Yup.object().shape({
+  name: Yup.string()
+    .min(3, "Name must be at least 3 characters")
+    .required("Name is required"),
+  email: Yup.string()
+    .email("Invalid email format")
+    .required("Email is required"),
+  password: Yup.string()
+    .min(6, "Password must be at least 6 characters")
+    .required("Password is required"),
+});
 
 const SignUp = () => {
   const [name, setName] = useState("");
@@ -23,39 +36,55 @@ const SignUp = () => {
 
   const handleRegister = async (e) => {
     e.preventDefault();
-  
-    if (!name || !email || !password) {
-      toast.error("Please fill in all fields!", { position: "top-center" });
+
+    try {
+      await validationSchema.validate(
+        { name, email, password },
+        { abortEarly: false }
+      );
+    } catch (err) {
+      err.inner.forEach((error) =>
+        toast.error(error.message, { position: "top-center" })
+      );
       return;
     }
-  
+
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
       const user = userCredential.user;
-  
+
       if (user) {
         await setDoc(doc(db, "users", user.uid), {
           name: name,
           email: user.email,
           createdAt: new Date(),
         });
-  
+
         console.log("User registered successfully!");
-        toast.success("User registered successfully!", { position: "top-center" });
+        toast.success("User registered successfully!", {
+          position: "top-center",
+        });
         navigate("/login");
       }
     } catch (error) {
       console.error("Error registering user:", error);
-  
+
       if (error.code === "auth/email-already-in-use") {
-        toast.error("This email is already registered. Try logging in.", { position: "bottom-center" });
+        toast.error("This email is already registered. Try logging in.", {
+          position: "bottom-center",
+        });
       } else {
-        toast.error("Failed to register user. Please try again.", { position: "bottom-center" });
+        toast.error("Failed to register user. Please try again.", {
+          position: "bottom-center",
+        });
       }
     }
   };
-  
-  
+
   const googleSignUp = async () => {
     const provider = new GoogleAuthProvider();
 
@@ -233,4 +262,3 @@ const SignUp = () => {
 };
 
 export default SignUp;
-
