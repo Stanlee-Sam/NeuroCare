@@ -60,6 +60,8 @@ const Dashboard = () => {
         }
         const data = await response.json();
         console.log("Journal Entries:", data);
+        console.log("🧠 API_BASE_URL =", API_BASE_URL);
+
 
         const sortedData = data.sort(
           (a, b) => new Date(a.createdAt) - new Date(b.createdAt)
