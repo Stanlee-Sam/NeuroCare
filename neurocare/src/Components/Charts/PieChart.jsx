@@ -2,7 +2,7 @@
 
 import axios from "axios";
 import { useEffect, useState, useCallback } from "react";
-import { SlOptions } from "react-icons/sl";
+// import { SlOptions } from "react-icons/sl";
 
 import { PieChart, Pie, Sector, ResponsiveContainer, Legend } from "recharts";
 import { auth } from "../../Components/Firebase/firebase.js";
@@ -212,9 +212,9 @@ const SentimentCategories = () => {
             <option value="monthly">Monthly</option>
           </select>
         </div>{" "}
-        <div>
+        {/* <div>
           <SlOptions />
-        </div>
+        </div> */}
       </div>
       <ResponsiveContainer width="100%" height={300}>
         {loading ? (

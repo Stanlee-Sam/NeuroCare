@@ -1,6 +1,6 @@
 "use client";
 
-import { SlOptions } from "react-icons/sl";
+// import { SlOptions } from "react-icons/sl";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { auth } from "../../Components/Firebase/firebase.js";
@@ -316,9 +316,9 @@ const StressLevels = () => {
             <option value="monthly">Monthly</option>
           </select>
         </div>
-        <div>
+        {/* <div>
           <SlOptions />
-        </div>
+        </div> */}
       </div>
       <ResponsiveContainer width="100%" height={300}>
         <BarChart

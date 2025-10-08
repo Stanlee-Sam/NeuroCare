@@ -1,6 +1,6 @@
 "use client";
 
-import { SlOptions } from "react-icons/sl";
+// import { SlOptions } from "react-icons/sl";
 import { useState, useMemo, useEffect } from "react";
 import PropTypes from "prop-types";
 import {
@@ -136,9 +136,9 @@ const SentimentChart = ({ journalEntries = [] }) => {
             <option value="monthly">Monthly</option>
           </select>
         </div>
-        <div>
+        {/* <div>
           <SlOptions />
-        </div>
+        </div> */}
       </div>
 
       <ResponsiveContainer width="100%" height={300}>

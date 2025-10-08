@@ -26,17 +26,14 @@ const Activity = () => {
 
   const handleDelete = async (id) => {
     try {
-        const token = await auth.currentUser.getIdToken();
+      const token = await auth.currentUser.getIdToken();
 
-        toast.info("Deleting activity...");
-      await axios.delete(`http://localhost:5000/api/journal/delete/${id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-  
-      );
+      toast.info("Deleting activity...");
+      await axios.delete(`http://localhost:5000/api/journal/delete/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       setActivities(activities.filter((activity) => activity.id !== id));
       toast.success("Activity deleted successfully");
     } catch (error) {
@@ -47,15 +44,17 @@ const Activity = () => {
 
   return (
     <div className="flex flex-col gap-4 max-h-[400px] md:max-h-[700px] ">
-      <div>
-        <h1 className="text-center font-bold pt-2">Recent Activity</h1>
-      </div>
       <div className="overflow-y-auto flex flex-col gap-4 scrollable-container rounded-lg">
+      <div>
+              <h1 className="text-center font-bold pt-2">Recent Activity</h1>
+            </div>
         {activities.map((activity) => (
           <div
             key={activity.id}
             className=" bg-gray-300 p-4 rounded-lg flex flex-col gap-2 transition ease-in-out delay-150 hover:-translate-y-1 hover:scale-100 hover:shadow-xl"
           >
+            
+
             <div className="flex justify-between items-center">
               <div className="flex justify-between gap-1">
                 <h1 className="font-bold lg:text-[17px] text-[10px]">
