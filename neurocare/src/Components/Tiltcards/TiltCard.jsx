@@ -4,13 +4,14 @@ import { auth } from "../../Components/Firebase/firebase";
 
 const Cards = () => {
   const [journalEntries, setJournalEntries] = useState([]);
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
 
   useEffect(() => {
     const fetchJournalEntries = async () => {
       try {
         const token = await auth.currentUser.getIdToken();
 
-        const response = await fetch("http://localhost:5000/api/journal", {
+        const response = await fetch(`${API_BASE_URL}/api/journal`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

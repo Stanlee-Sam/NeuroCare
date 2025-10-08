@@ -37,6 +37,7 @@ const Dashboard = () => {
   const [sentimentChange, setSentimentChange] = useState(0);
   const [mostFrequentMood, setMostFrequentMood] = useState("N/A");
   const [totalEntries, setTotalEntries] = useState(0);
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
 
   useEffect(() => {
     trackFeatureUsage("Dashboard");
@@ -48,7 +49,7 @@ const Dashboard = () => {
         const token = await auth.currentUser.getIdToken();
 
 
-        const response = await fetch("http://localhost:5000/api/journal", {
+        const response = await fetch(`{${API_BASE_URL}/api/journal`, {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`, 

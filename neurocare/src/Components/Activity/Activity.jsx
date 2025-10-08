@@ -6,12 +6,14 @@ import { auth } from "../../Components/Firebase/firebase.js";
 const Activity = () => {
   const [activities, setActivities] = useState([]);
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+
   useEffect(() => {
     const fetchActivities = async () => {
       try {
         const token = await auth.currentUser.getIdToken();
 
-        const response = await axios.get("http://localhost:5000/api/journal", {
+        const response = await axios.get(`${API_BASE_URL}/api/journal`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

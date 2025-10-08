@@ -93,6 +93,8 @@ const SentimentCategories = () => {
   const [allEntries, setAllEntries] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+
   // const fixedNow = new Date("2025-03-26T02:29:07.000Z");
 
   const updateSentimentData = useCallback((entries, selectedTimeSpan) => {
@@ -107,7 +109,7 @@ const SentimentCategories = () => {
     const fetchJournalEntries = async () => {
       try {
         const token = await auth.currentUser.getIdToken();
-        const response = await axios.get("http://localhost:5000/api/journal", {
+        const response = await axios.get(`${API_BASE_URL}/api/journal`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

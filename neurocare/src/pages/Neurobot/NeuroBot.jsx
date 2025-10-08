@@ -13,6 +13,7 @@ import { auth } from "../../Components/Firebase/firebase.js";
 import { useSentiment } from "../../context/SentimentContext.jsx";
 
 const NeuroBot = () => {
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
   useEffect(() => {
     trackFeatureUsage("NeuroBot");
   }, []);
@@ -156,7 +157,7 @@ const NeuroBot = () => {
         
       };
 
-      const response = await fetch("http://localhost:5000/api/chat", {
+      const response = await fetch(`${API_BASE_URL}/api/chat`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -1,7 +1,7 @@
 import LandingPage from "./pages/LandingPage";
 import Login from "./pages/Login/Login";
 import Dashboard from "./pages/Dashboard/Dashboard";
-import SignUp from "./pages/Signup/SignIn.Jsx";
+import SignUp from "./pages/Signup/SignIn.jsx";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Journal from "./pages/Journal/Journal";
 import NeuroBot from "./pages/Neurobot/NeuroBot";

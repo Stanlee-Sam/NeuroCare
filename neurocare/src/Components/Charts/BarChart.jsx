@@ -160,6 +160,8 @@ const StressLevels = () => {
   const [timeSpan, setTimeSpan] = useState("daily");
   const [stressData, setStressData] = useState([]);
 
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+
   useEffect(() => {
     const fetchStressLevels = async () => {
       try {
@@ -169,7 +171,7 @@ const StressLevels = () => {
           return;
         }
         const response = await axios.get(
-          `http://localhost:5000/api/journal/chart?timeSpan=${timeSpan}`,
+          `${API_BASE_URL}/api/journal/chart?timeSpan=${timeSpan}`,
           {
             headers: {
               "Content-Type": "application/json",

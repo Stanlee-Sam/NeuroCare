@@ -19,6 +19,7 @@ const Journal = () => {
   const [loading, setLoading] = useState(true);
   // const [error, setError] = useState(null);
   const { sentiment, setSentiment,journalText, setJournalText } = useSentiment();
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
 
   useEffect(() => {
     trackFeatureUsage("Mood Tracking");
@@ -57,7 +58,7 @@ const Journal = () => {
 
       console.log("Sending Journal Entry Data:", entryData);
 
-      const response = await fetch("http://localhost:5000/api/journal/create", {
+      const response = await fetch(`${API_BASE_URL}/api/journal/create`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -102,7 +103,7 @@ const Journal = () => {
       }
 
       const userToken = await user.getIdToken();
-      const response = await fetch("http://localhost:5000/api/analyze", {
+      const response = await fetch(`${API_BASE_URL}/api/analyze`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -158,7 +159,7 @@ const Journal = () => {
         const token = await auth.currentUser.getIdToken();
         console.log("User ID:", auth.currentUser?.uid);
 
-        const response = await fetch("http://localhost:5000/api/journal", {
+        const response = await fetch(`${API_BASE_URL}/api/journal`, {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,

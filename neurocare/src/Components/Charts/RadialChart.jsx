@@ -11,13 +11,14 @@ import { auth } from "../../Components/Firebase/firebase";
 import axios from "axios";
 const FeatureInteraction = () => {
   const [data, setData] = useState([]);
+  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
 
   // Function to fetch feature usage data
   const fetchFeatureUsage = async () => {
     try {
       const token = await auth.currentUser.getIdToken();
 
-      const response = await fetch("http://localhost:5000/api/feature-usage", {
+      const response = await fetch(`${API_BASE_URL}/api/feature-usage`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
