@@ -15,6 +15,7 @@ import { auth, db } from "../../Components/Firebase/firebase";
 import { setDoc, doc, getDoc } from "firebase/firestore";
 import { toast } from "react-toastify";
 import * as Yup from "yup";
+import Logo from "../../../src/assets/Logo-hero.png"
 
 const validationSchema = Yup.object().shape({
   name: Yup.string()
@@ -158,7 +159,7 @@ const SignUp = () => {
     <section className=" grid place-items-center bg-[#D9D9D9] md:h-screen  ">
       <div className=" place-self-center md:flex bg-white  md:w-[50%] w-[100%] ">
         <div className="bg-[#77DD77] md:rounded-r-xl max-[770px]:rounded-b-full md:w-2/5 grid place-items-center ">
-          <div className="place-items-center">
+          <div className="flex flex-col items-center">
             <h1 className=" text-[20px] min-[1140px]:text-2xl max-[770px]:mt-5 text-white md:mb-2 font-bold">
               Welcome back !
             </h1>
@@ -167,7 +168,9 @@ const SignUp = () => {
             <p className="text-center px-2 mb-3 text-white max-[700px]:text-[15px] max-[500px]:px-10">
               To keep connected with us please login with your personal info{" "}
             </p>
-            <button className="max-[770px]:mb-5 border-2 border-white inline-block text-white hover:bg-white rounded-full px-12 py-2 font-semibold mt-5 hover:text-[#77DD77] w-full">
+            <button 
+            className="border-2 border-white rounded-full p-3 w-[250px] mb-5 text-white  hover:bg-white hover:text-[#77DD77] font-semibold"
+            >
               <Link to="/login"> Sign In</Link>
             </button>
           </div>
@@ -176,7 +179,7 @@ const SignUp = () => {
           <div className="md:place-self-end place-self-center invisible md:visible ">
             <img
               className="w-2 md:w-20 "
-              src="../../../src/assets/Logo-hero.png"
+              src={Logo}
               alt=""
             />
           </div>

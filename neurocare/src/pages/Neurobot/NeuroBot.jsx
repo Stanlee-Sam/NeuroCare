@@ -11,6 +11,7 @@ import { CiCirclePlus } from "react-icons/ci";
 import { IoBulbOutline } from "react-icons/io5";
 import { auth } from "../../Components/Firebase/firebase.js";
 import { useSentiment } from "../../context/SentimentContext.jsx";
+import NeurobotLogo from '../../../src/assets/NeuroBot Logo.png'
 
 const NeuroBot = () => {
   const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
@@ -189,7 +190,7 @@ const NeuroBot = () => {
         <div className="h-20 w-20 md:h-15 md:w-15">
           <img
             className="w-15 h-15"
-            src="../../../src/assets/NeuroBot Logo.png"
+            src={NeurobotLogo}
             alt=""
           />
         </div>

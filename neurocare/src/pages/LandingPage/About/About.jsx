@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import AboutUs from "../../../../src/assets/laptop.jpeg"
 const About = () => {
   return (
     <section className="pt-10 pb-20">
@@ -11,7 +12,7 @@ const About = () => {
         <div className="md:w-[50%] pl-10">
           <img
             className="rounded-md w-[500px] "
-            src="../../../../src/assets/laptop.jpeg"
+            src={AboutUs}
             alt=""
           />
         </div>

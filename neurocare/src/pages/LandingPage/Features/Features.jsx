@@ -1,3 +1,7 @@
+import Mood from "../../../../src/assets/Mood.jpeg";
+import Chatbot from "../../../../src/assets/Chatbot.jpeg"
+import Book from "../../../../src/assets/Book.jpeg"
+
 const Features = () => {
   return (
     <section className="bg-[#77DD77] rounded-t-lg pb-20">
@@ -9,7 +13,7 @@ const Features = () => {
           <div>
             <img
               className="w-[100px] h-[100px] pt-2 rounded-lg"
-              src="../../../../src/assets/Mood.jpeg"
+              src={Mood}
               alt=""
             />
           </div>
@@ -28,7 +32,7 @@ const Features = () => {
           <div>
             <img
               className="w-[100px] h-[100px] pt-2 rounded-lg"
-              src="../../../../src/assets/Chatbot.jpeg"
+              src={Chatbot}
               alt=""
             />
           </div>
@@ -47,7 +51,7 @@ const Features = () => {
           <div>
             <img
               className="w-[100px] h-[100px] pt-2 rounded-lg"
-              src="../../../../src/assets/Book.jpeg"
+              src={Book}
               alt=""
             />
           </div>

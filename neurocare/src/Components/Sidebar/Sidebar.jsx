@@ -8,6 +8,9 @@ import { IoSettings } from "react-icons/io5";
 import { RiLogoutCircleLine } from "react-icons/ri";
 import { useLogout } from "../Firebase/useLogout.js";
 import { useAuth } from "../Firebase/useAuth";
+import SidebarLogo from "../../../src/assets/Logo-no-bg.png";
+import LeftArrow from '../../../src/assets/left-arrow.jpg'
+
 const Sidebar = () => {
   const [open, setOpen] = useState(false);
   const logout = useLogout();
@@ -24,7 +27,7 @@ const Sidebar = () => {
           className={`${
             open ? "visible" : "invisible"
           } w-[80px] justify-self-center`}
-          src="../../../../src/assets/Logo-no-bg.png"
+          src={SidebarLogo}
           alt=""
         />
         <img
@@ -32,7 +35,7 @@ const Sidebar = () => {
                 ${
                   !open && "rotate-180"
                 } w-7 absolute top-6 -right-3 cursor-pointer rounded-full border-2 border-[#77DD77] `}
-          src="../../../../src/assets/left-arrow.jpg"
+          src={LeftArrow}
           alt=""
           onClick={() => setOpen(!open)}
         />

@@ -15,6 +15,7 @@ import { setDoc, doc, getDoc } from "firebase/firestore";
 
 import { toast } from "react-toastify";
 import * as Yup from "yup";
+import Logo from "../../../src/assets/Logo-hero.png";
 
 const loginSchema = Yup.object().shape({
   email: Yup.string()
@@ -24,7 +25,6 @@ const loginSchema = Yup.object().shape({
     .min(6, "Password must be at least 6 characters")
     .required("Password is required"),
 });
-
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -42,7 +42,6 @@ const Login = () => {
       );
       return;
     }
-
 
     try {
       await signInWithEmailAndPassword(auth, email, password);
@@ -140,7 +139,7 @@ const Login = () => {
           <div className="">
             <img
               className="md:w-20 w-2 invisible md:visible"
-              src="../../../src/assets/Logo-hero.png"
+              src={Logo}
               alt=""
             />
           </div>
@@ -224,8 +223,8 @@ const Login = () => {
 
         {/* Blue Section */}
         <div className="bg-[#608BC1] md:rounded-l-xl max-[770px]:rounded-t-full md:w-2/5 grid place-items-center row-start md:row-start-auto">
-          <div className="place-items-center">
-            <h1 className=" text-[20px] min-[1140px]:text-2xl max-[770px]:mt-5 text-white md:mb-2 font-bold">
+          <div className="flex flex-col items-center gap-1">
+            <h1 className=" text-[20px] min-[1140px]:text-2xl max-[770px]:mt-1 text-white md:mb-2 font-bold">
               Hello, Friend!
             </h1>
             <div className="border-2 place-self-center md:my-5 border-white inline-block mb-2 w-10"></div>
@@ -233,7 +232,7 @@ const Login = () => {
             <p className="text-center px-2 md:mb-3 text-white text-[12px] md:text-[20px]">
               Enter your personal details and start your journey with us
             </p>
-            <button className="border-2 border-white inline-block text-white hover:bg-white rounded-full px-12 py-2 font-semibold mt-3 md:mt-5 hover:text-[#608BC1] w-full">
+            <button className="border-2 border-white rounded-full p-3 w-[250px]  text-white  hover:bg-white hover:text-[#608BC1] font-semibold">
               <Link to="/signup"> Sign Up</Link>
             </button>
           </div>
@@ -244,5 +243,3 @@ const Login = () => {
 };
 
 export default Login;
-
-
