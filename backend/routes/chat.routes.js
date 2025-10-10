@@ -4,34 +4,47 @@ require("dotenv").config();
 
 const router = express.Router();
 const API_KEY = process.env.GEMINI_API_KEY;
-const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`;
+const MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash";
 
+if (!API_KEY) {
+  console.error(
+    "🚨 GEMINI_API_KEY is missing - set it in your .env or platform secrets"
+  );
+}
+
+const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${encodeURIComponent(
+  API_KEY || ""
+)}`;
 router.post("/chat", async (req, res) => {
   console.log("Request payload:", req.body);
   const { userMessage, sentiment, journalEntry } = req.body;
 
   try {
-    const response = await axios.post(GEMINI_API_URL, {
-      contents: [
-        {
-          parts: [
-            // Guiding Instruction for Gemini
-            {
-              text: `Here is a journal entry written by the user:\n\n"${journalEntry}".\n\nThe detected sentiment is "${
-                sentiment?.mood || "neutral"
-              }". Please provide a response that acknowledges the specific content of the journal entry while also considering the sentiment until when the user changes the topic so go accordingly to what they say.If the journal entry is null or empty just respond to the entered user message. Avoid generic responses.`,
-            },
-            {
-              text: "You are NeuroBot, a compassionate AI therapist. Please generate a response that is fully punctuated with proper spacing, clear sentence breaks, and new lines for each new point or bullet. Use proper grammar and include emojis where appropriate.",
-            },
+    const response = await axios.post(
+      GEMINI_API_URL,
+      {
+        contents: [
+          {
+            parts: [
+              // Guiding Instruction for Gemini
+              {
+                text: `Here is a journal entry written by the user:\n\n"${journalEntry}".\n\nThe detected sentiment is "${
+                  sentiment?.mood || "neutral"
+                }". Please provide a response that acknowledges the specific content of the journal entry while also considering the sentiment until when the user changes the topic so go accordingly to what they say.If the journal entry is null or empty just respond to the entered user message. Avoid generic responses.`,
+              },
+              {
+                text: "You are NeuroBot, a compassionate AI therapist. Please generate a response that is fully punctuated with proper spacing, clear sentence breaks, and new lines for each new point or bullet. Use proper grammar and include emojis where appropriate.",
+              },
 
-            {
-              text: `User: ${userMessage}`,
-            },
-          ],
-        },
-      ],
-    });
+              {
+                text: `User: ${userMessage}`,
+              },
+            ],
+          },
+        ],
+      },
+      { headers: { "Content-Type": "application/json" } }
+    );
 
     console.log("Gemini API Response:", response.data);
 

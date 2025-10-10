@@ -41,13 +41,16 @@ app.get("/", (req, res) => {
   res.send("Backend is running!");
 });
 
+app.use("/api", chatRoutes);
 //Routes
 app.use("/api/auth", authRoutes);
 
 app.use("/api", authenticate, sentimentRoutes);
 app.use("/api/journal", authenticate, journalRoutes);
 app.use("/api", authenticate, featureRoutes);
-app.use("/api", authenticate, chatRoutes);
+// app.use("/api", authenticate, chatRoutes);
+
+
 
 app.use(errorHandler);
 

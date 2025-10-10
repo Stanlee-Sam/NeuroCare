@@ -11,10 +11,11 @@ import { CiCirclePlus } from "react-icons/ci";
 import { IoBulbOutline } from "react-icons/io5";
 import { auth } from "../../Components/Firebase/firebase.js";
 import { useSentiment } from "../../context/SentimentContext.jsx";
-import NeurobotLogo from '../../../src/assets/NeuroBot Logo.png'
+import NeurobotLogo from "../../../src/assets/NeuroBot Logo.png";
 
 const NeuroBot = () => {
-  const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
+  const API_BASE_URL =
+    import.meta.env.VITE_API_BASE_URL || "http://localhost:5000";
   useEffect(() => {
     trackFeatureUsage("NeuroBot");
   }, []);
@@ -149,13 +150,16 @@ const NeuroBot = () => {
 
   const getBotResponse = async (userMessage) => {
     try {
-      const token = await auth.currentUser.getIdToken();
+      let token = null;
+
+      if (auth.currentUser) {
+        token = await auth.currentUser.getIdToken();
+      }
 
       const payload = {
         userMessage,
         journalEntry: journalText,
         sentiment: sentiment ? sentiment : null,
-        
       };
 
       const response = await fetch(`${API_BASE_URL}/api/chat`, {
@@ -168,6 +172,8 @@ const NeuroBot = () => {
       });
 
       if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Backend error:", response.status, errorText);
         throw new Error("Failed to get response from the server");
       }
 
@@ -188,11 +194,7 @@ const NeuroBot = () => {
       <Sidebar />
       <div className="text-2xl h-screen flex flex-col items-center flex-1 w-full">
         <div className="h-20 w-20 md:h-15 md:w-15">
-          <img
-            className="w-15 h-15"
-            src={NeurobotLogo}
-            alt=""
-          />
+          <img className="w-15 h-15" src={NeurobotLogo} alt="" />
         </div>
         <div className="flex flex-row gap-1 pl-10 md:pl-14 h-screen pb-3 w-full">
           <div className="w-full px-4">
