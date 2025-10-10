@@ -31,7 +31,7 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000
       const token = await auth.currentUser.getIdToken();
 
       toast.info("Deleting activity...");
-      await axios.delete(`http://localhost:5000/api/journal/delete/${id}`, {
+      await axios.delete(`${API_BASE_URL}/api/journal/delete/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

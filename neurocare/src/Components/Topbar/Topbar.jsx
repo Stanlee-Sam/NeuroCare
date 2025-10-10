@@ -1,5 +1,6 @@
 import { FaBell } from "react-icons/fa";
 import { IoMdSearch } from "react-icons/io";
+import Avatar from "../../../src/assets/avatar.jpg"
 
 const Topbar = () => {
   return (
@@ -22,7 +23,7 @@ const Topbar = () => {
         <div className="w-8">
           <img
             className="w-full rounded-full cursor-pointer "
-            src="../../../src/assets/avatar.jpg"
+            src={Avatar}
             alt=""
           />
         </div>
