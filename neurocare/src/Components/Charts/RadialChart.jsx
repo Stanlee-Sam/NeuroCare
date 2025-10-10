@@ -49,7 +49,7 @@ const FeatureInteraction = () => {
       console.log("Tracking feature usage:", featureName);
 
       const token = await auth.currentUser.getIdToken();
-      await axios.post("http://localhost:5000/api/track-feature", {
+      await axios.post(`${API_BASE_URL}/api/track-feature`, {
         feature: featureName,
           headers: {
             Authorization: `Bearer ${token}`, 
